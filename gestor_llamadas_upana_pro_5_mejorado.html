@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full light" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPANA Call Center Analytics — Sistema Profesional de Rendimiento CRM</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- FontAwesome Pro Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        upana: {
+                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+                            400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+                            800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                        'glow': '0 0 25px -5px rgba(99, 102, 241, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.25); border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.45); }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-full flex flex-col antialiased transition-colors duration-300 selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Glow Effect -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-pink-500/5 blur-[120px] pointer-events-none -z-10"></div>
+
+    <!-- Header Corporativo -->
+    <header class="glass-card sticky top-0 z-40 border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-xl shadow-indigo-500/30 border border-indigo-400/30">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base sm:text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
+                            UPANA Call Center • Analizador CRM Pro
+                        </h1>
+                        <span class="px-2 py-0.5 text-[10px] font-extrabold bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full border border-indigo-500/30 uppercase tracking-wider">v3.0 Enterprise</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Deduplicación por Agente • Auditoría de Leads • Exportación de 3 Hojas</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleTheme()" class="bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 p-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm w-10 h-10 border border-slate-300/80 dark:border-slate-700 flex items-center justify-center" title="Cambiar Tema">
+                    <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+                <button onclick="limpiarTodo()" class="bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-700 dark:text-slate-300 hover:text-rose-600 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm border border-slate-300/80 dark:border-slate-700 flex items-center space-x-2">
+                    <i class="fa-solid fa-arrow-rotate-left text-indigo-600 dark:text-indigo-400"></i>
+                    <span>Restablecer</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow flex flex-col gap-6">
+        
+        <!-- Upload Section -->
+        <div id="uploadSection" class="glass-card rounded-3xl shadow-xl p-8 border border-slate-200 dark:border-slate-800 transition-all">
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="text-lg font-black text-slate-900 dark:text-white mb-1">Carga tu archivo Excel o CSV de Llamadas CRM</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">El sistema analizará automáticamente las columnas, validará la calidad de datos y deduplicará los leads por agente.</p>
+                
+                <div class="flex justify-center px-6 pt-8 pb-8 border-2 border-indigo-300 dark:border-indigo-800 border-dashed rounded-3xl hover:border-indigo-500 transition cursor-pointer bg-slate-50/80 dark:bg-slate-900/50 group" id="dropZone">
+                    <div class="space-y-3 text-center">
+                        <div class="w-16 h-16 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-3xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform border border-indigo-500/20 shadow-inner">
+                            <i class="fa-solid fa-file-excel text-3xl"></i>
+                        </div>
+                        <div class="flex text-sm text-slate-600 dark:text-slate-300 justify-center">
+                            <label for="excelFile" class="relative cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold px-5 py-2.5 shadow-md transition-all text-xs">
+                                <span>Seleccionar archivo Excel / CSV</span>
+                                <input id="excelFile" name="excelFile" type="file" accept=".xlsx, .xls, .csv" class="sr-only">
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Soporta formatos .xlsx, .xls y .csv de Zoho CRM</p>
+                    </div>
+                </div>
+                <div id="fileName" class="mt-4 text-xs font-bold text-indigo-600 dark:text-indigo-400 hidden flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> <span id="fileNameText"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Completo (Oculto inicialmente) -->
+        <div id="dashboardSection" class="hidden flex flex-col gap-6">
+            
+            <!-- KPIs Generales -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="kpiContainer">
+                <!-- Inyectado por JS -->
+            </div>
+
+            <!-- Data Quality & Actions Bar -->
+            <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-300" id="dataQualityBadge">
+                    <i class="fa-solid fa-shield-check text-emerald-500 text-base"></i>
+                    <span>Auditoría de Datos: <strong>100% válidos</strong> (0 registros sin propietario ni anomalías)</span>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <button onclick="exportarExcelGeneral()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Descargar Excel General (3 Hojas)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabs de Navegación -->
+            <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto custom-scrollbar">
+                <button onclick="switchTab('cards')" id="tabCardsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-md transition whitespace-nowrap">
+                    <i class="fa-solid fa-id-card mr-1.5"></i> Fichas por Agente
+                </button>
+                <button onclick="switchTab('ranking')" id="tabRankingBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                    <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i> Ranking de Desempeño
+                </button>
+                <button onclick="switchTab('insights')" id="tabInsightsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                    <i class="fa-solid fa-lightbulb mr-1.5 text-purple-500"></i> Insights del Período
+                </button>
+                <button onclick="switchTab('charts')" id="tabChartsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie mr-1.5 text-emerald-500"></i> Gráficos Analíticos
+                </button>
+
+            </div>
+
+            <!-- TAB 1: Tarjetas por Agente -->
+            <div id="tabCardsContent" class="space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-users text-indigo-500"></i> Listado de Asesores de Admisiones
+                    </h3>
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </span>
+                        <input type="text" id="searchInput" placeholder="Buscar agente por nombre..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div id="agentsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <!-- TAB 2: Ranking -->
+            <div id="tabRankingContent" class="hidden space-y-4">
+                <div class="glass-card rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                        <div>
+                            <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-trophy text-amber-500"></i> Ranking Ejecutivo de Desempeño
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ordenamiento interactivo por métricas clave de conversión y volumen</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-bold text-slate-500">Ordenar por:</label>
+                            <select id="rankingSortSelect" onchange="actualizarRanking()" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none">
+                                <option value="agendadas">Más Agendados</option>
+                                <option value="respondidas">Más Contactados</option>
+                                <option value="leadsUnicos">Más Leads Reales</option>
+                                <option value="totalCalls">Más Llamadas</option>
+                                <option value="tasaContactoNum">Mayor Tasa de Contacto (%)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-950 text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-extrabold border-b border-slate-200 dark:border-slate-800">
+                                    <th class="py-3 px-4">Posición</th>
+                                    <th class="py-3 px-4">Asesor / Extensión</th>
+                                    <th class="py-3 px-4 text-center">Llamadas</th>
+                                    <th class="py-3 px-4 text-center">Leads Reales</th>
+                                    <th class="py-3 px-4 text-center">Contactados</th>
+                                    <th class="py-3 px-4 text-center">Agendados</th>
+                                    <th class="py-3 px-4 text-center">Tasa Contacto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60 text-xs font-medium">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Insights -->
+            <div id="tabInsightsContent" class="hidden space-y-4">
+                <div class="glass-card rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+                    <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-lightbulb text-purple-500"></i> Insights Automáticos del Período
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="insightsContainer">
+                        <!-- Dinámico -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: Gráficos -->
+            <div id="tabChartsContent" class="hidden space-y-6">
+              <header class="rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-7 text-white shadow-2xl"><div class="text-[10px] font-black uppercase tracking-[.24em] text-indigo-300">Centro de análisis</div><div class="mt-2 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"><div><h2 class="text-3xl font-black">Gráficos analíticos</h2><p class="mt-2 text-sm text-slate-300">Vista ejecutiva del volumen, eficiencia y resultados del período.</p></div><div class="rounded-2xl border border-white/10 bg-white/10 px-4 py-3"><div class="text-[10px] uppercase text-slate-300">Agentes incluidos</div><div id="chartAgentCount" class="text-2xl font-black">—</div></div></div></header>
+              <div class="grid grid-cols-1 xl:grid-cols-5 gap-5"><article class="xl:col-span-3 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-indigo-500">Comparativo por agente</div><h3 class="mt-1 font-black">Llamadas y leads únicos</h3><p class="text-xs text-slate-500">Barras horizontales para equipos de cualquier tamaño.</p></div><div class="overflow-x-auto"><div id="chartAgentsInner" class="relative min-h-[320px]"><canvas id="chartLlamadasLeads"></canvas></div></div></article>
+              <article class="xl:col-span-2 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Resultado del contacto</div><h3 class="mt-1 font-black">Distribución de resultados</h3><p class="text-xs text-slate-500">Composición de los leads gestionados.</p></div><div class="relative mx-auto h-64 max-w-sm"><canvas id="chartResultados"></canvas></div></article></div>
+              <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-violet-500">Eficiencia</div><h3 class="mt-1 font-black">Tasa de contacto por agente</h3><p class="text-xs text-slate-500">Leads únicos contactados o agendados.</p></div><div class="overflow-x-auto"><div id="chartEfficiencyInner" class="relative min-h-[220px]"><canvas id="chartEficiencia"></canvas></div></div></article>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Detalle Agente -->
+    <div id="modalDetalle" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]" id="modalContainer">
+            <div class="p-5 px-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/80 dark:bg-slate-800/40">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/30 text-sm shadow-inner">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalAgenteName" class="font-black text-base text-slate-800 dark:text-white">Detalle de Leads y Llamadas</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium" id="modalAgenteSub">Deduplicación activa</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModal()" class="w-9 h-9 rounded-full bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white flex items-center justify-center transition text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 px-6 border-b border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/40 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="relative w-full sm:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" id="modalSearch" onkeyup="filtrarModalLeads()" placeholder="Buscar lead o resultado..." class="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button onclick="exportarExcelIndividual()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-file-excel"></i> Descargar Excel (3 Hojas)</button>
+                    <button onclick="copiarResumenTeams()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-copy"></i> Copiar Teams
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-auto custom-scrollbar p-6 flex-grow">
+                <table class="w-full min-w-[760px] text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-950 text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-extrabold border-b border-slate-200 dark:border-slate-800">
+                            <th class="py-3 px-4">#</th>
+                            <th class="py-3 px-4">Nombre del Lead</th>
+                            <th class="py-3 px-4 text-center whitespace-nowrap">Intentos</th>
+                            <th class="py-3 px-4">Historial de Intentos & Estado Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60 text-xs font-medium">
+                        <!-- Dinámico -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-4 px-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/30 flex justify-end">
+                <button onclick="cerrarModal()" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl text-xs font-bold transition">
+                    Cerrar Ventana
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-slate-200/80 dark:border-slate-800/80 py-5 text-center text-xs text-slate-500 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span class="font-semibold">Universidad Panamericana • Departamento de Admisiones & Call Center</span>
+            <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">Desarrollado para Daniel Galvez • 2026</span>
+        </div>
+    </footer>
+
+    <!-- Script Principal -->
+    <script>
+        let currentTheme = 'light';
+        function toggleTheme() {
+            const html = document.getElementById('htmlRoot');
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('light')) {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-sm text-amber-400';
+                currentTheme = 'dark';
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                icon.className = 'fa-solid fa-moon text-sm';
+                currentTheme = 'light';
+            }
+        }
+
+        const catalogoAgentes = [
+            { nombre: "Evely Sarahí Churumía Gomez", ext: "8001" },
+            { nombre: "Justa Gabriela Jaes Sánchez", ext: "8002" },
+            { nombre: "Javier Sebastian Alvarez Ruano", ext: "8003" },
+            { nombre: "Merlin Carolina Bajan Ibañez", ext: "8004" },
+            { nombre: "Mónica Paola Ordoñez Morales", ext: "8005" },
+            { nombre: "Joselyne Andrea Velásquez Padilla", ext: "8007" },
+            { nombre: "Jackeline Stephanie Castillo Calderón", ext: "8008" },
+            { nombre: "Mildred Gabriela Cordero Canté", ext: "8009" },
+            { nombre: "Tania Izamar de León Quiñonez", ext: "8010" },
+            { nombre: "Jorge Eduardo Hernández Lima", ext: "8011" },
+            { nombre: "Jorge Mario Veliz Acajabón", ext: "8013" },
+            { nombre: "Madelin Gabriela Ovando Franco", ext: "8014" },
+            { nombre: "Andrea María Jiménez Orellana", ext: "8016" },
+            { nombre: "Diego Rolando Chiché Pineda", ext: "8017" },
+            { nombre: "Ashley Dinora Mishelle Alvarado López", ext: "8018" },
+            { nombre: "Synndy Elizabeth Sanchez Salazar", ext: "8020" },
+            { nombre: "Josabeth Mishell de León Flores", ext: "8021" },
+            { nombre: "Angelica Abigaíl Gálvez Alvarez", ext: "8022" },
+            { nombre: "Jose David López Morales", ext: "8023" },
+            { nombre: "Evelyn Sarahí de León Lorenzana", ext: "8024" },
+            { nombre: "Marilyn Alexandra Molina Ramírez", ext: "8025" },
+            { nombre: "Bryan Christofer Hernandez Cruz", ext: "8026" },
+            { nombre: "Jonatan Rafael Sánchez Tinti", ext: "8027" },
+            { nombre: "Marta Julia Morales Solorzano", ext: "8028" },
+            { nombre: "José Pablo Ibañez", ext: "8029" }
+        ];
+
+        let globalRawData = [];
+        let globalAgentsData = [];
+        let globalStats = {};
+        let currentSelectedAgent = null;
+        let chartLlamadasLeadsInstance = null;
+        let chartResultadosInstance = null;
+        let chartEficienciaInstance = null;
+
+        const fileInput = document.getElementById('excelFile');
+        const fileNameDiv = document.getElementById('fileName');
+        const fileNameText = document.getElementById('fileNameText');
+        const uploadSection = document.getElementById('uploadSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const searchInput = document.getElementById('searchInput');
+
+        fileInput.addEventListener('change', handleFileSelect);
+        searchInput.addEventListener('input', filterAgents);
+
+        function switchTab(tab) {
+            ['Cards', 'Ranking', 'Insights', 'Charts'].forEach(t => {
+                const content = document.getElementById(`tab${t}Content`);
+                const btn = document.getElementById(`tab${t}Btn`);
+                if (content) content.classList.add('hidden');
+                if (btn) btn.className = "px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap";
+            });
+
+            const activeContent = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Content`);
+            const activeBtn = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`);
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) activeBtn.className = "px-4 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-md transition whitespace-nowrap";
+
+            if (tab === 'ranking') actualizarRanking();
+            else if (tab === 'insights') renderInsights();
+            else if (tab === 'charts') renderCharts();
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            fileNameText.textContent = file.name;
+            fileNameDiv.classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                processExcelData(json);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function normalizarTexto(str) {
+            if (!str) return "";
+            return str
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[̀-ͯ]/g, "")
+                .replace(/[^a-z0-9\s]/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        function buscarAgenteOficial(nombreDetectado) {
+            if (!nombreDetectado) return { nombre: "Agente Desconocido", ext: "8000" };
+            let normDetectado = normalizarTexto(nombreDetectado);
+            for (let ag of catalogoAgentes) {
+                if (normalizarTexto(ag.nombre) === normDetectado) return ag;
+            }
+            let palabras = normDetectado.split(" ");
+            let mejor = null;
+            let maxC = 0;
+            for (let ag of catalogoAgentes) {
+                let normOf = normalizarTexto(ag.nombre);
+                let c = 0;
+                palabras.forEach(p => { if (p.length > 2 && normOf.includes(p)) c++; });
+                if (c > maxC) { maxC = c; mejor = ag; }
+            }
+            if (mejor && maxC >= 2) return mejor;
+            return { nombre: nombreDetectado, ext: "8000" };
+        }
+
+        function extraerNombreLeadDesdeAsunto(asunto) {
+            if (!asunto) return "Lead sin nombre";
+            let limpio = asunto.toString().trim();
+            let prefixes = [
+                "llamada saliente a", "llamada entrante de", 
+                "llamada programada con", "llamada programada a", 
+                "llamada de", "llamada a"
+            ];
+            let lower = limpio.toLowerCase();
+            for (let pref of prefixes) {
+                if (lower.startsWith(pref)) {
+                    limpio = limpio.substring(pref.length).trim();
+                    break;
+                }
+            }
+            return limpio || asunto;
+        }
+
+        function processExcelData(data) {
+            if (data.length === 0) {
+                alert("El archivo Excel está vacío.");
+                return;
+            }
+
+            globalRawData = data;
+            let rawAgentsMap = {};
+            let totalCalls = data.length;
+
+            data.forEach(row => {
+                let idReg = row['ID de registro'] || row['id'] || '';
+                let asunto = row['Asunto'] || '';
+                let ownerNameRaw = row['Propietario de la llamada'] || 'Sin Asignar';
+                let resultado = row['Resultado de la llamada'] || '';
+                let estadoLlamada = row['Estado de llamada'] || '';
+                let estadoSaliente = row['Estado de llamada saliente'] || '';
+                let programadoCRM = row['Programado en CRM'] || false;
+                let tipoLlamada = row['Tipo de llamada'] || '';
+                let duracion = row['Duración de la llamada'] || row['Duración de la llamada (en segundos)'] || '';
+                let fechaHora = row['Hora de inicio de la llamada'] || row['Hora de creación'] || '-';
+
+                // Robust CRM logic fallback if result is empty
+                let resultadoEfectivo = resultado;
+                if (!resultadoEfectivo || resultadoEfectivo.toString().trim() === '') {
+                    if (programadoCRM === true || programadoCRM === 'True' || estadoSaliente.toLowerCase().includes('sched')) {
+                        resultadoEfectivo = 'Agendó Reunión';
+                    } else {
+                        resultadoEfectivo = 'Sin Resultado';
+                    }
+                }
+
+                let agenteOficial = buscarAgenteOficial(ownerNameRaw);
+                let agenteNombre = agenteOficial.nombre;
+                let agenteExt = agenteOficial.ext;
+
+                if (!rawAgentsMap[agenteNombre]) {
+                    rawAgentsMap[agenteNombre] = { name: agenteNombre, ext: agenteExt, calls: [] };
+                }
+
+                let leadName = extraerNombreLeadDesdeAsunto(asunto);
+                rawAgentsMap[agenteNombre].calls.push({
+                    id: idReg,
+                    asunto: asunto,
+                    leadName: leadName,
+                    resultado: resultadoEfectivo.toString().trim(),
+                    estadoLlamada: estadoLlamada,
+                    estadoSaliente: estadoSaliente,
+                    programadoCRM: programadoCRM,
+                    tipoLlamada: tipoLlamada,
+                    duracion: duracion,
+                    fechaHora: fechaHora
+                });
+            });
+
+            globalAgentsData = [];
+            let totalLeadsReales = 0;
+            let totalContactadosGlobal = 0;
+            let totalAgendadosGlobal = 0;
+            let totalNoRespondidasGlobal = 0;
+
+            Object.values(rawAgentsMap).forEach(agentObj => {
+                let agentCalls = agentObj.calls.length;
+                let leadsMap = {};
+                agentObj.calls.forEach(call => {
+                    let key = normalizarTexto(call.leadName);
+                    if (!leadsMap[key]) {
+                        leadsMap[key] = { nombreOriginal: call.leadName, intentos: [] };
+                    }
+                    leadsMap[key].intentos.push(call);
+                });
+
+                let leadsUnicosList = Object.values(leadsMap);
+                let nLeadsUnicos = leadsUnicosList.length;
+                totalLeadsReales += nLeadsUnicos;
+
+                let agendadasCount = 0;
+                let respondidasCount = 0;
+                let noRespondidasCount = 0;
+
+                leadsUnicosList.forEach(lead => {
+                    let tieneAgendada = lead.intentos.some(i => {
+                        let r = i.resultado.toLowerCase();
+                        let a = i.asunto.toLowerCase();
+                        return r.includes("programada") || r.includes("agendada") || r.includes("agendó") || r.includes("agendo") || a.includes("programada") || i.programadoCRM === true;
+                    });
+                    let tieneRespondida = lead.intentos.some(i => {
+                        let r = i.resultado.toLowerCase();
+                        return r.includes("interesado") || r.includes("contactado") || r.includes("inscrito") || r.includes("informacion") || r.includes("información") || r.includes("requiere") || r.includes("devolver");
+                    });
+                    let todoNoResponde = lead.intentos.every(i => {
+                        let r = i.resultado.toLowerCase();
+                        return r.includes("no responde") || r.includes("buzon") || r.includes("ocupado") || r.includes("desconectado") || r.includes("invalido") || r.includes("inválido") || r.includes("equivocado");
+                    });
+
+                    if (tieneAgendada) {
+                        agendadasCount++;
+                        lead.estadoFinal = "Agendada";
+                    } else if (tieneRespondida) {
+                        respondidasCount++;
+                        lead.estadoFinal = "Contactada";
+                    } else if (todoNoResponde) {
+                        noRespondidasCount++;
+                        lead.estadoFinal = "No respondida";
+                    } else {
+                        if (tieneRespondida) { respondidasCount++; lead.estadoFinal = "Contactada"; }
+                        else { noRespondidasCount++; lead.estadoFinal = "No respondida"; }
+                    }
+                });
+
+                totalAgendadosGlobal += agendadasCount;
+                totalContactadosGlobal += respondidasCount;
+                totalNoRespondidasGlobal += noRespondidasCount;
+
+                let tasaContactoNum = nLeadsUnicos > 0 ? ((respondidasCount + agendadasCount) / nLeadsUnicos * 100) : 0;
+                let tasaAgendamientoNum = nLeadsUnicos > 0 ? (agendadasCount / nLeadsUnicos * 100) : 0;
+
+                globalAgentsData.push({
+                    name: agentObj.name,
+                    ext: agentObj.ext,
+                    totalCalls: agentCalls,
+                    leadsUnicos: nLeadsUnicos,
+                    agendadas: agendadasCount,
+                    respondidas: respondidasCount,
+                    noRespondidas: noRespondidasCount,
+                    tasaContactoNum: tasaContactoNum,
+                    tasaContacto: tasaContactoNum.toFixed(1) + '%',
+                    tasaAgendamientoNum: tasaAgendamientoNum,
+                    tasaAgendamiento: tasaAgendamientoNum.toFixed(1) + '%',
+                    leadsList: leadsUnicosList
+                });
+            });
+
+            globalStats = {
+                totalCalls: totalCalls,
+                totalLeadsReales: totalLeadsReales,
+                totalAgentes: globalAgentsData.length,
+                totalContactados: totalContactadosGlobal,
+                totalAgendados: totalAgendadosGlobal,
+                totalNoRespondidas: totalNoRespondidasGlobal,
+                tasaContactoGeneral: totalLeadsReales > 0 ? ((totalContactadosGlobal + totalAgendadosGlobal) / totalLeadsReales * 100).toFixed(1) + '%' : '0.0%',
+                tasaAgendamientoGeneral: totalLeadsReales > 0 ? (totalAgendadosGlobal / totalLeadsReales * 100).toFixed(1) + '%' : '0.0%'
+            };
+
+            renderKPIs();
+            renderAgentCards(globalAgentsData);
+
+            dashboardSection.classList.remove('hidden');
+            uploadSection.classList.add('hidden');
+
+        }
+
+        function renderKPIs() {
+            const kpiContainer = document.getElementById('kpiContainer');
+            kpiContainer.innerHTML = `
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-slate-400 uppercase">Llamadas</span>
+                    <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${globalStats.totalCalls}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-slate-400 uppercase">Leads Reales</span>
+                    <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${globalStats.totalLeadsReales}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-slate-400 uppercase">Agentes</span>
+                    <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${globalStats.totalAgentes}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-emerald-500 uppercase">Contactados</span>
+                    <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">${globalStats.totalContactados}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-purple-500 uppercase">Agendados</span>
+                    <div class="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">${globalStats.totalAgendados}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-amber-500 uppercase">No Respondidas</span>
+                    <div class="text-xl font-black text-amber-600 dark:text-amber-400 mt-1">${globalStats.totalNoRespondidas}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-indigo-500 uppercase">Tasa Contacto</span>
+                    <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${globalStats.tasaContactoGeneral}</div>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
+                    <span class="text-[10px] font-extrabold text-purple-500 uppercase">Tasa Agendamiento</span>
+                    <div class="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">${globalStats.tasaAgendamientoGeneral}</div>
+                </div>
+            `;
+        }
+
+        function renderAgentCards(agents) {
+            const agentsGrid = document.getElementById('agentsGrid');
+            agentsGrid.innerHTML = '';
+
+            agents.forEach(agent => {
+                const cardHtml = `
+                    <div class="glass-card rounded-3xl shadow-xl overflow-hidden agent-card flex flex-col justify-between border border-slate-200 dark:border-slate-800 hover:shadow-2xl transition-all" data-agent-name="${agent.name.toLowerCase()}">
+                        <div class="bg-gradient-to-r from-indigo-50/80 via-white to-purple-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/40 p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-start gap-3">
+                            <div class="flex items-center space-x-3.5">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-lg border border-indigo-500/30 shadow-inner">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Asesor de Admisiones</span>
+                                    <h3 class="text-base font-black text-slate-900 dark:text-white">${agent.name}</h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">Extensión: <strong class="text-indigo-600 dark:text-indigo-400">${agent.ext}</strong></p>
+                                </div>
+                            </div>
+                            <div class="bg-indigo-600 text-white text-xs font-black px-3 py-1.5 rounded-xl shadow-md">
+                                ${agent.totalCalls} llamadas
+                            </div>
+                        </div>
+
+                        <div class="p-5 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/50 dark:bg-slate-950/30">
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-[10px] font-extrabold text-slate-400 uppercase">Leads Reales</span>
+                                <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${agent.leadsUnicos}</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-[10px] font-extrabold text-purple-500 uppercase">Agendadas</span>
+                                <div class="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">${agent.agendadas}</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-[10px] font-extrabold text-emerald-500 uppercase">Respondidas</span>
+                                <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">${agent.respondidas}</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-[10px] font-extrabold text-amber-500 uppercase">No Respondidas</span>
+                                <div class="text-xl font-black text-amber-600 dark:text-amber-400 mt-1">${agent.noRespondidas}</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold">Tasa de contacto: <strong>${agent.tasaContacto}</strong></span>
+                            <button onclick="abrirDetalleAgente('${encodeURIComponent(agent.name)}')" class="bg-indigo-500/10 hover:bg-indigo-600 text-indigo-600 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm border border-indigo-500/30 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-list-check"></i>
+                                <span>Ver Ficha Detallada</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                agentsGrid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        function filterAgents() {
+            const query = searchInput.value.toLowerCase();
+            document.querySelectorAll('.agent-card').forEach(card => {
+                const name = card.getAttribute('data-agent-name');
+                card.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function actualizarRanking() {
+            const sortBy = document.getElementById('rankingSortSelect').value;
+            let sorted = [...globalAgentsData].sort((a, b) => b[sortBy] - a[sortBy]);
+            const tbody = document.getElementById('rankingTableBody');
+            let html = "";
+
+            sorted.forEach((agent, idx) => {
+                let badgeMedal = `<span class="font-bold text-slate-500">${idx + 1}</span>`;
+                if (idx === 0) badgeMedal = `<span class="px-2 py-1 bg-amber-500/10 text-amber-600 font-black rounded-lg border border-amber-500/30">🥇 1° Lugar</span>`;
+                else if (idx === 1) badgeMedal = `<span class="px-2 py-1 bg-slate-400/10 text-slate-600 dark:text-slate-300 font-black rounded-lg border border-slate-400/30">🥈 2° Lugar</span>`;
+                else if (idx === 2) badgeMedal = `<span class="px-2 py-1 bg-amber-700/10 text-amber-700 dark:text-amber-500 font-black rounded-lg border border-amber-700/30">🥉 3° Lugar</span>`;
+
+                html += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition">
+                        <td class="py-3.5 px-4">${badgeMedal}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-800 dark:text-white">
+                            ${agent.name} <span class="text-xs font-mono text-indigo-600 dark:text-indigo-400 font-semibold">(Ext. ${agent.ext})</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center font-bold">${agent.totalCalls}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-indigo-600">${agent.leadsUnicos}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-emerald-600">${agent.respondidas}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-purple-600">${agent.agendadas}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-slate-700 dark:text-slate-300">${agent.tasaContacto}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderInsights() {
+            if (globalAgentsData.length === 0) return;
+            let sortedByCalls = [...globalAgentsData].sort((a, b) => b.totalCalls - a.totalCalls);
+            let sortedByContact = [...globalAgentsData].sort((a, b) => b.respondidas - a.respondidas);
+            let sortedByAgenda = [...globalAgentsData].sort((a, b) => b.agendadas - a.agendadas);
+
+            const container = document.getElementById('insightsContainer');
+            container.innerHTML = `
+                <div class="p-5 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-500 text-white flex items-center justify-center shrink-0 font-bold"><i class="fa-solid fa-phone"></i></div>
+                    <div>
+                        <h4 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase">Mayor Volumen de Llamadas</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">El asesor <strong>${sortedByCalls[0].name}</strong> (Ext. ${sortedByCalls[0].ext}) realizó la mayor cantidad de llamadas con un total de <strong>${sortedByCalls[0].totalCalls} llamadas</strong>.</p>
+                    </div>
+                </div>
+                <div class="p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 font-bold"><i class="fa-solid fa-user-check"></i></div>
+                    <div>
+                        <h4 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase">Mayor Contacto de Leads Reales</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">El asesor <strong>${sortedByContact[0].name}</strong> contactó la mayor cantidad de leads únicos con <strong>${sortedByContact[0].respondidas} leads respondidos</strong>.</p>
+                    </div>
+                </div>
+                <div class="p-5 rounded-2xl bg-purple-500/5 border border-purple-500/20 flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-purple-500 text-white flex items-center justify-center shrink-0 font-bold"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div>
+                        <h4 class="text-xs font-black text-purple-600 dark:text-purple-400 uppercase">Líder en Agendamiento</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">El asesor <strong>${sortedByAgenda[0].name}</strong> encabeza los agendamientos con <strong>${sortedByAgenda[0].agendadas} leads programados</strong>.</p>
+                    </div>
+                </div>
+                <div class="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold"><i class="fa-solid fa-chart-line"></i></div>
+                    <div>
+                        <h4 class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase">Eficiencia General</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">El sistema procesó un total de <strong>${globalStats.totalCalls} llamadas</strong> agrupadas en <strong>${globalStats.totalLeadsReales} leads reales</strong>, logrando una tasa de contacto general del <strong>${globalStats.tasaContactoGeneral}</strong>.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCharts() {
+          const agents=[...globalAgentsData].sort((a,b)=>b.totalCalls-a.totalCalls), short=n=>n.length>22?n.slice(0,20).trimEnd()+'…':n;
+          document.getElementById('chartAgentCount').textContent=agents.length;
+          const hh=Math.max(320,agents.length*38+36), ih=document.getElementById('chartAgentsInner'); ih.style.height=hh+'px'; ih.style.minWidth=agents.length>18?'760px':'100%';
+          if(chartLlamadasLeadsInstance) chartLlamadasLeadsInstance.destroy();
+          chartLlamadasLeadsInstance=new Chart(document.getElementById('chartLlamadasLeads'),{type:'bar',data:{labels:agents.map(a=>a.name),datasets:[{label:'Llamadas',data:agents.map(a=>a.totalCalls),backgroundColor:'#6366f1',borderRadius:6},{label:'Leads únicos',data:agents.map(a=>a.leadsUnicos),backgroundColor:'#10b981',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:9,color:'#64748b',font:{size:11}}},tooltip:{backgroundColor:'#0f172a',padding:12,callbacks:{title:i=>agents[i[0].dataIndex].name}}},scales:{x:{beginAtZero:true,grid:{color:'rgba(148,163,184,.15)'},ticks:{precision:0,color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#64748b',callback:(_,i)=>short(agents[i].name)}}}}});
+          if(chartResultadosInstance) chartResultadosInstance.destroy(); chartResultadosInstance=new Chart(document.getElementById('chartResultados'),{type:'doughnut',data:{labels:['Agendados','Respondidos','No respondidos'],datasets:[{data:[globalStats.totalAgendados,globalStats.totalContactados,globalStats.totalNoRespondidas],backgroundColor:['#8b5cf6','#10b981','#f59e0b'],borderColor:'#fff',borderWidth:3,hoverOffset:7}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,color:'#64748b'}},tooltip:{backgroundColor:'#0f172a',padding:12,callbacks:{label:c=>{let t=c.dataset.data.reduce((x,y)=>x+y,0);return ' '+c.label+': '+c.raw.toLocaleString('es-GT')+' ('+(t?(c.raw/t*100).toFixed(1):'0.0')+'%)'}}}}}});
+          const eff=[...agents].sort((a,b)=>(parseFloat(b.tasaContactoNum)||0)-(parseFloat(a.tasaContactoNum)||0)), eh=document.getElementById('chartEfficiencyInner'); eh.style.height=Math.max(220,eff.length*34+48)+'px';eh.style.minWidth=eff.length>24?'760px':'100%';
+          if(chartEficienciaInstance) chartEficienciaInstance.destroy(); chartEficienciaInstance=new Chart(document.getElementById('chartEficiencia'),{type:'bar',data:{labels:eff.map(a=>a.name),datasets:[{label:'Tasa de contacto',data:eff.map(a=>Number(a.tasaContactoNum)||0),backgroundColor:'#8b5cf6',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',callbacks:{title:i=>eff[i[0].dataIndex].name,label:i=>' Tasa de contacto: '+i.raw.toFixed(1)+'%'}}},scales:{x:{beginAtZero:true,max:100,grid:{color:'rgba(148,163,184,.15)'},ticks:{callback:v=>v+'%',color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#64748b',callback:(_,i)=>short(eff[i].name)}}}}});
+        }
+
+        function abrirDetalleAgente(nameEncoded) {
+            const agentName = decodeURIComponent(nameEncoded);
+            currentSelectedAgent = globalAgentsData.find(a => a.name === agentName);
+            if (!currentSelectedAgent) return;
+
+            document.getElementById('modalAgenteName').textContent = currentSelectedAgent.name;
+            document.getElementById('modalAgenteSub').textContent = `Extensión: ${currentSelectedAgent.ext} • Leads únicos: ${currentSelectedAgent.leadsUnicos} • Llamadas totales: ${currentSelectedAgent.totalCalls}`;
+            document.getElementById('modalSearch').value = '';
+
+            renderModalLeads(currentSelectedAgent.leadsList);
+
+            const modal = document.getElementById('modalDetalle');
+            const container = document.getElementById('modalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                container.classList.remove('scale-95');
+                container.classList.add('scale-100');
+            }, 10);
+        }
+
+        function renderModalLeads(leadsList) {
+            const tbody = document.getElementById('modalTableBody');
+            let html = "";
+
+            leadsList.forEach((lead, idx) => {
+                let ultimoRes = lead.intentos[lead.intentos.length - 1].resultado;
+                let badgeClass = "bg-slate-100 text-slate-700 border-slate-300";
+                let estLower = ultimoRes.toLowerCase();
+
+                if (estLower.includes("interesado") || estLower.includes("contactado")) {
+                    badgeClass = "bg-emerald-500/10 text-emerald-600 border-emerald-500/30";
+                } else if (estLower.includes("no responde") || estLower.includes("buzon") || estLower.includes("ocupado")) {
+                    badgeClass = "bg-amber-500/10 text-amber-600 border-amber-500/30";
+                } else if (estLower.includes("programada") || estLower.includes("agendada")) {
+                    badgeClass = "bg-purple-500/10 text-purple-600 border-purple-500/30";
+                }
+
+                let intentosBadges = lead.intentos.map((intent, iIdx) => {
+                    return `<span class="px-2 py-0.5 rounded-lg text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200">Intento #${iIdx+1}: <strong>${intent.resultado}</strong></span>`;
+                }).join(' ');
+
+                html += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition">
+                        <td class="py-3.5 px-4 font-mono text-slate-400 font-bold">${idx + 1}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-800 dark:text-white flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-black text-xs border border-indigo-500/20 shadow-inner">
+                                ${lead.nombreOriginal.charAt(0).toUpperCase()}
+                            </div>
+                            <span>${lead.nombreOriginal}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                            <span class="inline-flex whitespace-nowrap px-2.5 py-1 rounded-xl bg-slate-200/70 dark:bg-slate-800 font-extrabold text-slate-700 dark:text-slate-300 border border-slate-300">
+                                ${lead.intentos.length} ${lead.intentos.length === 1 ? 'intento' : 'intentos'}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="flex flex-col gap-1.5">
+                                <div><span class="px-3 py-1 rounded-xl text-[11px] font-extrabold border ${badgeClass}">● ${ultimoRes} (Estado: ${lead.estadoFinal})</span></div>
+                                <div class="flex flex-wrap gap-1 mt-1">${intentosBadges}</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function filtrarModalLeads() {
+            if (!currentSelectedAgent) return;
+            const query = normalizarTexto(document.getElementById('modalSearch').value);
+            if (!query) { renderModalLeads(currentSelectedAgent.leadsList); return; }
+            const filtrados = currentSelectedAgent.leadsList.filter(lead => {
+                return normalizarTexto(lead.nombreOriginal).includes(query) || lead.intentos.some(i => normalizarTexto(i.resultado).includes(query));
+            });
+            renderModalLeads(filtrados);
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modalDetalle');
+            const container = document.getElementById('modalContainer');
+            modal.classList.add('opacity-0');
+            container.classList.remove('scale-100');
+            container.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function limpiarTodo() {
+            fileInput.value = '';
+            fileNameDiv.classList.add('hidden');
+            dashboardSection.classList.add('hidden');
+            uploadSection.classList.remove('hidden');
+            globalAgentsData = [];
+            globalRawData = [];
+        }
+
+        function copiarResumenTeams() {
+            if (!currentSelectedAgent) return;
+            let texto = `📊 *REPORTE DE DESEMPEÑO - UPANA*\n👤 *Asesor:* ${currentSelectedAgent.name} (Ext. ${currentSelectedAgent.ext})\n───────────────────────────────\n📞 *Llamadas totales:* ${currentSelectedAgent.totalCalls}\n👥 *Leads reales (únicos):* ${currentSelectedAgent.leadsUnicos}\n📅 *Agendadas:* ${currentSelectedAgent.agendadas}\n✅ *Contactados:* ${currentSelectedAgent.respondidas}\n❌ *No respondidas:* ${currentSelectedAgent.noRespondidas}\n📈 *Tasa de contacto:* ${currentSelectedAgent.tasaContacto}\n✨ *Universidad Panamericana • Admisiones*`;
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("¡Resumen copiado al portapapeles para MS Teams!");
+            });
+        }
+
+        function exportarExcelIndividual() {
+            if (!currentSelectedAgent) return;
+            let wb = XLSX.utils.book_new();
+
+            // 1. Resumen
+            let rankingIdx = [...globalAgentsData].sort((a,b) => b.agendadas - a.agendadas).findIndex(a => a.name === currentSelectedAgent.name) + 1;
+            let resumenData = [
+                ["Métrica", "Valor"],
+                ["Nombre del agente", currentSelectedAgent.name],
+                ["Extensión", currentSelectedAgent.ext],
+                ["Ranking", `${rankingIdx}° Lugar`],
+                ["Llamadas totales", currentSelectedAgent.totalCalls],
+                ["Leads únicos", currentSelectedAgent.leadsUnicos],
+                ["Contactados", currentSelectedAgent.respondidas],
+                ["No respondidos", currentSelectedAgent.noRespondidas],
+                ["Agendados", currentSelectedAgent.agendadas],
+                ["Sin clasificar", 0],
+                ["Tasa de contacto", currentSelectedAgent.tasaContacto],
+                ["Tasa de agendamiento", currentSelectedAgent.tasaAgendamiento],
+                ["Promedio de llamadas por lead", (currentSelectedAgent.totalCalls / (currentSelectedAgent.leadsUnicos || 1)).toFixed(2)],
+                ["Fecha de generación", new Date().toLocaleString()]
+            ];
+            let wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
+
+            // 2. Leads
+            let leadsData = [["Lead", "Estado final", "Número de intentos", "Resultado del último intento", "Fecha del último intento", "Agendado", "Contactado", "No respondido", "Sin clasificar"]];
+            currentSelectedAgent.leadsList.forEach(lead => {
+                let ultimo = lead.intentos[lead.intentos.length - 1];
+                let estLower = ultimo.resultado.toLowerCase();
+                let agendado = (lead.estadoFinal === "Agendada") ? "Sí" : "No";
+                let contactado = (lead.estadoFinal === "Contactada") ? "Sí" : "No";
+                let noRespondido = (lead.estadoFinal === "No respondida") ? "Sí" : "No";
+                let sinClasificar = (agendado === "No" && contactado === "No" && noRespondido === "No") ? "Sí" : "No";
+
+                leadsData.push([
+                    lead.nombreOriginal,
+                    lead.estadoFinal,
+                    lead.intentos.length,
+                    ultimo.resultado,
+                    ultimo.fechaHora || "-",
+                    agendado,
+                    contactado,
+                    noRespondido,
+                    sinClasificar
+                ]);
+            });
+            let wsLeads = XLSX.utils.aoa_to_sheet(leadsData);
+            XLSX.utils.book_append_sheet(wb, wsLeads, "Leads");
+
+            // 3. Historial
+            let historialData = [["Lead", "Número de intento", "ID de registro", "Fecha/hora", "Resultado", "Clasificación", "Asunto", "Tipo de llamada", "Estado de llamada", "Estado de llamada saliente", "Programado en CRM", "Duración"]];
+            currentSelectedAgent.leadsList.forEach(lead => {
+                lead.intentos.forEach((int, idx) => {
+                    historialData.push([
+                        lead.nombreOriginal,
+                        idx + 1,
+                        int.id || "-",
+                        int.fechaHora || "-",
+                        int.resultado,
+                        lead.estadoFinal,
+                        int.asunto,
+                        int.tipoLlamada || "-",
+                        int.estadoLlamada || "-",
+                        int.estadoSaliente || "-",
+                        int.programadoCRM ? "Sí" : "No",
+                        int.duracion || "-"
+                    ]);
+                });
+            });
+            let wsHistorial = XLSX.utils.aoa_to_sheet(historialData);
+            XLSX.utils.book_append_sheet(wb, wsHistorial, "Historial");
+
+            let filename = `Rendimiento_${currentSelectedAgent.name.replace(/\s+/g, '_')}_2026-10-05.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        function exportarExcelGeneral() {
+            let wb = XLSX.utils.book_new();
+
+            // Hoja 1 — Resumen general
+            let resumenRows = [["Agente", "Extensión", "Ranking", "Total llamadas", "Leads únicos", "Contactados", "No respondidos", "Agendados", "Desconocidos", "Tasa de contacto", "Tasa de agendamiento", "Promedio de llamadas por lead"]];
+            let sortedByAgenda = [...globalAgentsData].sort((a,b) => b.totalCalls - a.totalCalls);
+            sortedByAgenda.forEach((a, idx) => {
+                resumenRows.push([
+                    a.name,
+                    a.ext,
+                    `${idx + 1}° Lugar`,
+                    a.totalCalls,
+                    a.leadsUnicos,
+                    a.respondidas,
+                    a.noRespondidas,
+                    a.agendadas,
+                    0,
+                    a.tasaContacto,
+                    a.tasaAgendamiento,
+                    (a.totalCalls / (a.leadsUnicos || 1)).toFixed(2)
+                ]);
+            });
+            let wsResumen = XLSX.utils.aoa_to_sheet(resumenRows);
+            wsResumen['!autofilter'] = { ref: `A1:L${resumenRows.length}` };
+            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen general");
+
+            // Hoja 2 — Leads
+            let leadsRows = [["Agente", "Extensión", "Lead", "Estado final", "Intentos", "Último resultado", "Última fecha", "Contactado", "No respondido", "Agendado", "Desconocido"]];
+            globalAgentsData.forEach(agent => {
+                agent.leadsList.forEach(lead => {
+                    let ultimo = lead.intentos[lead.intentos.length - 1];
+                    leadsRows.push([
+                        agent.name,
+                        agent.ext,
+                        lead.nombreOriginal,
+                        lead.estadoFinal,
+                        lead.intentos.length,
+                        ultimo.resultado,
+                        ultimo.fechaHora || "-",
+                        lead.estadoFinal === "Contactada" ? "Sí" : "No",
+                        lead.estadoFinal === "No respondida" ? "Sí" : "No",
+                        lead.estadoFinal === "Agendada" ? "Sí" : "No",
+                        "No"
+                    ]);
+                });
+            });
+            let wsLeads = XLSX.utils.aoa_to_sheet(leadsRows);
+            wsLeads['!autofilter'] = { ref: `A1:K${leadsRows.length}` };
+            XLSX.utils.book_append_sheet(wb, wsLeads, "Leads");
+
+            // Hoja 3 — Historial
+            let historialRows = [["Agente", "Extensión", "Lead", "Intento", "ID de registro", "Fecha/hora", "Resultado original", "Clasificación", "Asunto", "Tipo de llamada", "Estado de llamada", "Estado de llamada saliente", "Programado en CRM", "Duración"]];
+            globalAgentsData.forEach(agent => {
+                agent.leadsList.forEach(lead => {
+                    lead.intentos.forEach((int, idx) => {
+                        historialRows.push([
+                            agent.name,
+                            agent.ext,
+                            lead.nombreOriginal,
+                            idx + 1,
+                            int.id || "-",
+                            int.fechaHora || "-",
+                            int.resultado,
+                            lead.estadoFinal,
+                            int.asunto,
+                            int.tipoLlamada || "-",
+                            int.estadoLlamada || "-",
+                            int.estadoSaliente || "-",
+                            int.programadoCRM ? "Sí" : "No",
+                            int.duracion || "-"
+                        ]);
+                    });
+                });
+            });
+            let wsHistorial = XLSX.utils.aoa_to_sheet(historialRows);
+            wsHistorial['!autofilter'] = { ref: `A1:N${historialRows.length}` };
+            XLSX.utils.book_append_sheet(wb, wsHistorial, "Historial");
+
+            XLSX.writeFile(wb, "Rendimiento_General_Agentes_2026-10-05.xlsx");
+        }
+    </script>
+</body>
+</html>
