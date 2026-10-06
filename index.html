@@ -127,6 +127,19 @@
 
         <!-- Dashboard Completo (Oculto inicialmente) -->
         <div id="dashboardSection" class="hidden flex flex-col gap-6">
+
+            <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-indigo-200 dark:border-indigo-900/60">
+                <div>
+                    <label for="dateFilter" class="block text-xs font-extrabold text-slate-700 dark:text-slate-200 mb-1.5"><i class="fa-solid fa-calendar-day text-indigo-500 mr-1.5"></i>Filtrar por día de creación</label>
+                    <select id="dateFilter" onchange="filtrarPorDia()" class="w-full sm:w-72 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">Todos los días</option>
+                    </select>
+                </div>
+                <div class="text-xs text-slate-600 dark:text-slate-300 sm:text-right">
+                    <div class="font-extrabold">Período seleccionado</div>
+                    <div id="selectedPeriod" class="mt-1">Todos los días</div>
+                </div>
+            </div>
             
             <!-- KPIs Generales -->
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="kpiContainer">
@@ -307,7 +320,7 @@
     <footer class="glass-card border-t border-slate-200/80 dark:border-slate-800/80 py-5 text-center text-xs text-slate-500 mt-auto">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
             <span class="font-semibold">Universidad Panamericana • Departamento de Call Center</span>
-            <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">Desarrollado para CC • 2026</span>
+            <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">Desarrollado para Daniel Galvez • 2026</span>
         </div>
     </footer>
 
@@ -359,6 +372,7 @@
         ];
 
         let globalRawData = [];
+        let globalAllRawData = [];
         let globalAgentsData = [];
         let globalStats = {};
         let currentSelectedAgent = null;
@@ -372,6 +386,7 @@
         const uploadSection = document.getElementById('uploadSection');
         const dashboardSection = document.getElementById('dashboardSection');
         const searchInput = document.getElementById('searchInput');
+        const dateFilter = document.getElementById('dateFilter');
 
         fileInput.addEventListener('change', handleFileSelect);
         searchInput.addEventListener('input', filterAgents);
@@ -407,9 +422,75 @@
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
                 const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-                processExcelData(json);
+                globalAllRawData = json;
+                prepararFiltroFechas(json);
+                filtrarPorDia();
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        function obtenerFechaCreacion(row) {
+            return parsearFechaFiltro(row['Hora de creación']);
+        }
+
+        function parsearFechaFiltro(value) {
+            if (value === null || value === undefined || value === '') return null;
+            if (value instanceof Date && !Number.isNaN(value.getTime())) {
+                return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+            }
+            if (typeof value === 'number' && Number.isFinite(value) && value > 0 && value < 100000) {
+                const parsed = XLSX.SSF.parse_date_code(value);
+                if (parsed && parsed.y && parsed.m && parsed.d) {
+                    return `${parsed.y}-${String(parsed.m).padStart(2, '0')}-${String(parsed.d).padStart(2, '0')}`;
+                }
+                return null;
+            }
+            const text = String(value).trim();
+            let match = text.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:\D|$)/);
+            if (match) return `${match[1]}-${String(match[2]).padStart(2, '0')}-${String(match[3]).padStart(2, '0')}`;
+            match = text.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{2,4})(?:\D|$)/);
+            if (match) {
+                const year = Number(match[3]) < 100 ? (Number(match[3]) < 50 ? 2000 + Number(match[3]) : 1900 + Number(match[3])) : Number(match[3]);
+                return `${year}-${String(match[2]).padStart(2, '0')}-${String(match[1]).padStart(2, '0')}`;
+            }
+            const parsedDate = new Date(text);
+            if (!Number.isNaN(parsedDate.getTime())) {
+                return `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
+            }
+            return null;
+        }
+
+        function formatearDia(key) {
+            const [year, month, day] = key.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function periodoParaArchivo() {
+            return dateFilter.value === 'all' ? 'todos_los_dias' : dateFilter.value === 'undated' ? 'sin_fecha' : dateFilter.value;
+        }
+
+        function prepararFiltroFechas(data) {
+            const fechas = [...new Set(data.map(obtenerFechaCreacion).filter(Boolean))].sort();
+            const tieneSinFecha = data.some(row => !obtenerFechaCreacion(row));
+            dateFilter.innerHTML = '<option value="all">Todos los días</option>' +
+                fechas.map(fecha => `<option value="${fecha}">${formatearDia(fecha)}</option>`).join('') +
+                (tieneSinFecha ? '<option value="undated">Sin fecha de creación</option>' : '');
+        }
+
+        function filtrarPorDia() {
+            const seleccion = dateFilter.value;
+            let filas = globalAllRawData;
+            if (seleccion === 'undated') filas = filas.filter(row => !obtenerFechaCreacion(row));
+            else if (seleccion !== 'all') filas = filas.filter(row => obtenerFechaCreacion(row) === seleccion);
+            const fechaLabel = seleccion === 'all' ? 'Todos los días' : seleccion === 'undated' ? 'Sin fecha de creación' : formatearDia(seleccion);
+            document.getElementById('selectedPeriod').textContent = `${fechaLabel} · ${filas.length.toLocaleString('es-GT')} registros`;
+            currentSelectedAgent = null;
+            cerrarModal();
+            processExcelData(filas);
+            const activeTab = ['cards', 'ranking', 'insights', 'charts'].find(tab => !document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Content`).classList.contains('hidden')) || 'cards';
+            if (activeTab === 'ranking') actualizarRanking();
+            else if (activeTab === 'insights') renderInsights();
+            else if (activeTab === 'charts') renderCharts();
         }
 
         function normalizarTexto(str) {
@@ -886,6 +967,9 @@
             uploadSection.classList.remove('hidden');
             globalAgentsData = [];
             globalRawData = [];
+            globalAllRawData = [];
+            dateFilter.innerHTML = '<option value="all">Todos los días</option>';
+            document.getElementById('selectedPeriod').textContent = 'Todos los días';
         }
 
         function copiarResumenTeams() {
@@ -969,7 +1053,7 @@
             let wsHistorial = XLSX.utils.aoa_to_sheet(historialData);
             XLSX.utils.book_append_sheet(wb, wsHistorial, "Historial");
 
-            let filename = `Rendimiento_${currentSelectedAgent.name.replace(/\s+/g, '_')}_2026-10-05.xlsx`;
+            let filename = `Rendimiento_${currentSelectedAgent.name.replace(/\s+/g, '_')}_${periodoParaArchivo()}.xlsx`;
             XLSX.writeFile(wb, filename);
         }
 
@@ -1051,7 +1135,7 @@
             wsHistorial['!autofilter'] = { ref: `A1:N${historialRows.length}` };
             XLSX.utils.book_append_sheet(wb, wsHistorial, "Historial");
 
-            XLSX.writeFile(wb, "Rendimiento_General_Agentes_2026-10-05.xlsx");
+            XLSX.writeFile(wb, `Rendimiento_General_Agentes_${periodoParaArchivo()}.xlsx`);
         }
     </script>
 </body>
