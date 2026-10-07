@@ -84,13 +84,19 @@
                 </div>
             </div>
             
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center flex-wrap justify-center gap-2">
+                <button id="firebaseSignInBtn" onclick="window.firebaseIniciarSesion()" disabled class="disabled:opacity-40 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2">
+                    <i class="fa-brands fa-google"></i><span>Iniciar sesión</span>
+                </button>
+                <button id="firebaseSignOutBtn" onclick="window.firebaseCerrarSesion()" class="hidden bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm border border-slate-300/80 dark:border-slate-700" title="Cerrar sesión">Salir</button>
+                <button id="reloadDataBtn" onclick="recargarDatos()" disabled class="disabled:opacity-40 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm border border-slate-300/80 dark:border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i><span>Recargar</span>
+                </button>
+                <button id="feedDataBtn" onclick="abrirCargaDatos()" disabled class="disabled:opacity-40 bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-database"></i><span>Alimentar base</span>
+                </button>
                 <button onclick="toggleTheme()" class="bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 p-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm w-10 h-10 border border-slate-300/80 dark:border-slate-700 flex items-center justify-center" title="Cambiar Tema">
                     <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
-                </button>
-                <button onclick="limpiarTodo()" class="bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-700 dark:text-slate-300 hover:text-rose-600 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm border border-slate-300/80 dark:border-slate-700 flex items-center space-x-2">
-                    <i class="fa-solid fa-arrow-rotate-left text-indigo-600 dark:text-indigo-400"></i>
-                    <span>Restablecer</span>
                 </button>
             </div>
         </div>
@@ -98,9 +104,17 @@
 
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow flex flex-col gap-6">
+
+        <div id="databaseStatus" role="status" class="hidden rounded-2xl border px-4 py-3 text-xs font-semibold"></div>
+        <div id="databaseEmptyState" class="hidden glass-card rounded-3xl p-10 text-center border border-slate-200 dark:border-slate-800">
+            <div class="mx-auto mb-4 w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-database text-2xl"></i></div>
+            <h2 class="text-lg font-black">La base todavía está vacía</h2>
+            <p class="mt-2 text-sm text-slate-500">Alimenta la base con el Excel o CSV de llamadas para cargar el dashboard.</p>
+            <button onclick="abrirCargaDatos()" class="mt-5 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-database mr-2"></i>Alimentar base</button>
+        </div>
         
         <!-- Upload Section -->
-        <div id="uploadSection" class="glass-card rounded-3xl shadow-xl p-8 border border-slate-200 dark:border-slate-800 transition-all">
+        <div id="uploadSection" class="hidden glass-card rounded-3xl shadow-xl p-8 border border-slate-200 dark:border-slate-800 transition-all">
             <div class="max-w-2xl mx-auto text-center">
                 <h2 class="text-lg font-black text-slate-900 dark:text-white mb-1">Cargar archivo Excel o CSV de Llamadas CRM</h2>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">El sistema analizará automáticamente las columnas, validará la calidad de datos y deduplicará los leads por agente.</p>
@@ -167,6 +181,9 @@
                 <button onclick="switchTab('ranking')" id="tabRankingBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
                     <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i> Ranking de Desempeño
                 </button>
+                <button onclick="switchTab('comparison')" id="tabComparisonBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                    <i class="fa-solid fa-scale-balanced mr-1.5 text-sky-500"></i> Comparar agente
+                </button>
                 <button onclick="switchTab('insights')" id="tabInsightsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
                     <i class="fa-solid fa-lightbulb mr-1.5 text-purple-500"></i> Insights del Período
                 </button>
@@ -174,6 +191,26 @@
                     <i class="fa-solid fa-chart-pie mr-1.5 text-emerald-500"></i> Gráficos Analíticos
                 </button>
 
+            </div>
+
+            <div id="tabComparisonContent" class="hidden space-y-4">
+                <div class="glass-card rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+                    <div class="mb-5">
+                        <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-sky-500"></i> Comparación de rendimiento por día</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Selecciona un agente y dos fechas para comparar sus resultados.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                        <div><label for="comparisonAgent" class="block text-xs font-bold text-slate-500 mb-1.5">Agente</label><select id="comparisonAgent" onchange="renderComparacionAgente()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold"></select></div>
+                        <div><label for="comparisonDateA" class="block text-xs font-bold text-slate-500 mb-1.5">Primer día</label><select id="comparisonDateA" onchange="renderComparacionAgente()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold"></select></div>
+                        <div><label for="comparisonDateB" class="block text-xs font-bold text-slate-500 mb-1.5">Segundo día</label><select id="comparisonDateB" onchange="renderComparacionAgente()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold"></select></div>
+                    </div>
+                    <div id="comparisonResults" class="overflow-x-auto"></div>
+                    <div id="comparisonCharts" class="hidden grid grid-cols-1 xl:grid-cols-2 gap-5 mt-6">
+                        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm"><div class="mb-3"><div class="text-[10px] font-black uppercase tracking-widest text-indigo-500">Volumen</div><h4 class="mt-1 font-black">Llamadas y leads reales</h4></div><div class="relative h-64"><canvas id="comparisonCallsChart"></canvas></div></article>
+                        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm"><div class="mb-3"><div class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Resultados</div><h4 class="mt-1 font-black">Contactos y programaciones</h4></div><div class="relative h-64"><canvas id="comparisonOutcomesChart"></canvas></div></article>
+                        <article class="xl:col-span-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm"><div class="mb-3"><div class="text-[10px] font-black uppercase tracking-widest text-violet-500">Eficiencia</div><h4 class="mt-1 font-black">Tasas de contacto y programación</h4></div><div class="relative h-64"><canvas id="comparisonRatesChart"></canvas></div></article>
+                    </div>
+                </div>
             </div>
 
             <!-- TAB 1: Tarjetas por Agente -->
@@ -200,19 +237,22 @@
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
                         <div>
                             <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                <i class="fa-solid fa-trophy text-amber-500"></i> Ranking de Desempeño
+                                <i class="fa-solid fa-trophy text-amber-500"></i> Ranking Ejecutivo de Desempeño
                             </h3>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ordenamiento interactivo por métricas clave de conversión y volumen</p>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <label class="text-xs font-bold text-slate-500">Ordenar por:</label>
                             <select id="rankingSortSelect" onchange="actualizarRanking()" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none">
-                                <option value="agendadas">Más Agendados</option>
+                                <option value="agendadas">Más Programadas</option>
                                 <option value="respondidas">Más Contactados</option>
                                 <option value="leadsUnicos">Más Leads Reales</option>
                                 <option value="totalCalls">Más Llamadas</option>
                                 <option value="tasaContactoNum">Mayor Tasa de Contacto (%)</option>
                             </select>
+                            <button onclick="exportarRankingPDF()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                                <i class="fa-solid fa-file-pdf"></i> Exportar ranking PDF
+                            </button>
                         </div>
                     </div>
                     <div class="overflow-x-auto custom-scrollbar">
@@ -224,7 +264,7 @@
                                     <th class="py-3 px-4 text-center">Llamadas</th>
                                     <th class="py-3 px-4 text-center">Leads Reales</th>
                                     <th class="py-3 px-4 text-center">Contactados</th>
-                                    <th class="py-3 px-4 text-center">Agendados</th>
+                                    <th class="py-3 px-4 text-center">Programadas</th>
                                     <th class="py-3 px-4 text-center">Tasa Contacto</th>
                                 </tr>
                             </thead>
@@ -253,7 +293,7 @@
               <header class="rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-7 text-white shadow-2xl"><div class="text-[10px] font-black uppercase tracking-[.24em] text-indigo-300">Centro de análisis</div><div class="mt-2 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"><div><h2 class="text-3xl font-black">Gráficos analíticos</h2><p class="mt-2 text-sm text-slate-300">Vista ejecutiva del volumen, eficiencia y resultados del período.</p></div><div class="rounded-2xl border border-white/10 bg-white/10 px-4 py-3"><div class="text-[10px] uppercase text-slate-300">Agentes incluidos</div><div id="chartAgentCount" class="text-2xl font-black">—</div></div></div></header>
               <div class="grid grid-cols-1 xl:grid-cols-5 gap-5"><article class="xl:col-span-3 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-indigo-500">Comparativo por agente</div><h3 class="mt-1 font-black">Llamadas y leads únicos</h3><p class="text-xs text-slate-500">Barras horizontales para equipos de cualquier tamaño.</p></div><div class="overflow-x-auto"><div id="chartAgentsInner" class="relative min-h-[320px]"><canvas id="chartLlamadasLeads"></canvas></div></div></article>
               <article class="xl:col-span-2 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Resultado del contacto</div><h3 class="mt-1 font-black">Distribución de resultados</h3><p class="text-xs text-slate-500">Composición de los leads gestionados.</p></div><div class="relative mx-auto h-64 max-w-sm"><canvas id="chartResultados"></canvas></div></article></div>
-              <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-violet-500">Eficiencia</div><h3 class="mt-1 font-black">Tasa de contacto por agente</h3><p class="text-xs text-slate-500">Leads únicos contactados o agendados.</p></div><div class="overflow-x-auto"><div id="chartEfficiencyInner" class="relative min-h-[220px]"><canvas id="chartEficiencia"></canvas></div></div></article>
+              <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-lg"><div class="mb-4"><div class="text-[10px] font-black uppercase tracking-widest text-violet-500">Eficiencia</div><h3 class="mt-1 font-black">Tasa de contacto por agente</h3><p class="text-xs text-slate-500">Leads únicos contactados o programados.</p></div><div class="overflow-x-auto"><div id="chartEfficiencyInner" class="relative min-h-[220px]"><canvas id="chartEficiencia"></canvas></div></div></article>
             </div>
         </div>
 
@@ -379,6 +419,9 @@
         let chartLlamadasLeadsInstance = null;
         let chartResultadosInstance = null;
         let chartEficienciaInstance = null;
+        let chartComparacionVolumen = null;
+        let chartComparacionResultados = null;
+        let chartComparacionTasas = null;
 
         const fileInput = document.getElementById('excelFile');
         const fileNameDiv = document.getElementById('fileName');
@@ -392,7 +435,7 @@
         searchInput.addEventListener('input', filterAgents);
 
         function switchTab(tab) {
-            ['Cards', 'Ranking', 'Insights', 'Charts'].forEach(t => {
+            ['Cards', 'Ranking', 'Comparison', 'Insights', 'Charts'].forEach(t => {
                 const content = document.getElementById(`tab${t}Content`);
                 const btn = document.getElementById(`tab${t}Btn`);
                 if (content) content.classList.add('hidden');
@@ -405,6 +448,7 @@
             if (activeBtn) activeBtn.className = "px-4 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-md transition whitespace-nowrap";
 
             if (tab === 'ranking') actualizarRanking();
+            else if (tab === 'comparison') renderComparacionAgente();
             else if (tab === 'insights') renderInsights();
             else if (tab === 'charts') renderCharts();
         }
@@ -416,18 +460,91 @@
             fileNameDiv.classList.remove('hidden');
 
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-                globalAllRawData = json;
-                prepararFiltroFechas(json);
-                filtrarPorDia();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    if (typeof window.firebaseAlimentarDatos !== 'function') throw new Error('La conexión con Firebase todavía se está preparando. Intenta nuevamente en unos segundos.');
+                    mostrarEstadoDatabase(`Revisando ${json.length.toLocaleString('es-GT')} filas y guardando solo registros nuevos o modificados...`, 'info');
+                    await window.firebaseAlimentarDatos(json);
+                } catch (error) {
+                    mostrarEstadoDatabase(`No se pudo alimentar la base: ${error.message}`, 'error');
+                } finally {
+                    fileInput.value = '';
+                }
             };
             reader.readAsArrayBuffer(file);
         }
+
+        function mostrarEstadoDatabase(mensaje, tipo = 'info') {
+            const status = document.getElementById('databaseStatus');
+            const estilos = tipo === 'error'
+                ? 'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200'
+                : tipo === 'success'
+                    ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'
+                    : 'border-indigo-200 bg-indigo-50 text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-200';
+            status.className = `rounded-2xl border px-4 py-3 text-xs font-semibold ${estilos}`;
+            status.textContent = mensaje;
+        }
+
+        function abrirCargaDatos() {
+            if (!window.firebaseAutenticado) {
+                mostrarEstadoDatabase('Inicia sesión con una cuenta autorizada para alimentar la base.', 'error');
+                return;
+            }
+            fileInput.click();
+        }
+
+        async function recargarDatos() {
+            if (typeof window.firebaseRecargarDatos !== 'function') return;
+            await window.firebaseRecargarDatos();
+        }
+
+        window.obtenerRegistrosActuales = () => globalAllRawData;
+        window.onFirebaseDataLoaded = (rows, info = {}) => {
+            globalAllRawData = rows;
+            document.getElementById('databaseEmptyState').classList.toggle('hidden', rows.length > 0);
+            if (!rows.length) {
+                dashboardSection.classList.add('hidden');
+                mostrarEstadoDatabase('Conexión lista. La base está vacía; alimenta el sistema con el archivo de llamadas.', 'info');
+                return;
+            }
+            prepararFiltroFechas(rows);
+            dateFilter.value = 'all';
+            filtrarPorDia();
+            const prefijo = info.fromCache ? 'Datos cargados desde la caché local' : 'Datos sincronizados con Firestore';
+            const detalleFecha = info.latestDate ? ` · Última fecha: ${formatearDia(info.latestDate)}` : '';
+            mostrarEstadoDatabase(`${prefijo}: ${rows.length.toLocaleString('es-GT')} registros${detalleFecha}. La caché de este navegador conserva datos; evita equipos compartidos.`, 'success');
+        };
+
+        window.onFirebaseSignedOut = () => {
+            globalAllRawData = [];
+            globalRawData = [];
+            globalAgentsData = [];
+            globalStats = {};
+            dashboardSection.classList.add('hidden');
+            document.getElementById('databaseEmptyState').classList.add('hidden');
+        };
+
+        window.onFirebaseRowsSaved = (savedRows, summary) => {
+            const rowsByKey = new Map(globalAllRawData.map(row => [row.__firebaseSourceKey, row]));
+            savedRows.forEach(row => rowsByKey.set(row.__firebaseSourceKey, row));
+            globalAllRawData = [...rowsByKey.values()];
+            const selectedDate = dateFilter.value;
+            prepararFiltroFechas(globalAllRawData);
+            if ([...dateFilter.options].some(option => option.value === selectedDate)) dateFilter.value = selectedDate;
+            if (globalAllRawData.length) {
+                document.getElementById('databaseEmptyState').classList.add('hidden');
+                filtrarPorDia();
+            } else {
+                dashboardSection.classList.add('hidden');
+                document.getElementById('databaseEmptyState').classList.remove('hidden');
+            }
+            const omitted = summary.withoutDate ? ` ${summary.withoutDate} filas sin fecha se omitieron.` : '';
+            mostrarEstadoDatabase(`Base actualizada: ${summary.added} nuevos, ${summary.updated} actualizados y ${summary.unchanged} sin cambios.${omitted}`, 'success');
+        };
 
         function obtenerFechaCreacion(row) {
             return parsearFechaFiltro(row['Hora de creación']);
@@ -475,6 +592,28 @@
             dateFilter.innerHTML = '<option value="all">Todos los días</option>' +
                 fechas.map(fecha => `<option value="${fecha}">${formatearDia(fecha)}</option>`).join('') +
                 (tieneSinFecha ? '<option value="undated">Sin fecha de creación</option>' : '');
+            prepararSelectoresComparacion(fechas, tieneSinFecha);
+        }
+
+        function prepararSelectoresComparacion(fechas, tieneSinFecha) {
+            const dias = fechas.map(fecha => ({ value: fecha, label: formatearDiaSemana(fecha) }));
+            if (tieneSinFecha) dias.push({ value: 'undated', label: 'Sin fecha de creación' });
+            const opciones = dias.map(dia => `<option value="${dia.value}">${dia.label}</option>`).join('');
+            ['comparisonDateA', 'comparisonDateB'].forEach(id => {
+                const select = document.getElementById(id);
+                const anterior = select.value;
+                select.innerHTML = opciones;
+                if (dias.some(dia => dia.value === anterior)) select.value = anterior;
+                else if (id === 'comparisonDateB' && dias.length > 1) select.value = dias[1].value;
+            });
+        }
+
+        function actualizarSelectorAgentesComparacion() {
+            const select = document.getElementById('comparisonAgent');
+            const previo = select.value;
+            const agentes = [...new Set(globalAllRawData.map(row => buscarAgenteOficial(row['Propietario de la llamada'] || 'Sin Asignar').nombre))].sort((a, b) => a.localeCompare(b, 'es'));
+            select.innerHTML = agentes.map(nombre => `<option value="${escaparHTML(nombre)}">${escaparHTML(nombre)}</option>`).join('');
+            if (agentes.includes(previo)) select.value = previo;
         }
 
         function filtrarPorDia() {
@@ -487,8 +626,9 @@
             currentSelectedAgent = null;
             cerrarModal();
             processExcelData(filas);
-            const activeTab = ['cards', 'ranking', 'insights', 'charts'].find(tab => !document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Content`).classList.contains('hidden')) || 'cards';
+            const activeTab = ['cards', 'ranking', 'comparison', 'insights', 'charts'].find(tab => !document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Content`).classList.contains('hidden')) || 'cards';
             if (activeTab === 'ranking') actualizarRanking();
+            else if (activeTab === 'comparison') renderComparacionAgente();
             else if (activeTab === 'insights') renderInsights();
             else if (activeTab === 'charts') renderCharts();
         }
@@ -541,9 +681,9 @@
             return limpio || asunto;
         }
 
-        function processExcelData(data) {
+        function processExcelData(data, actualizarVista = true) {
             if (data.length === 0) {
-                alert("El archivo Excel está vacío.");
+                if (actualizarVista) alert("El archivo Excel está vacío.");
                 return;
             }
 
@@ -638,7 +778,7 @@
 
                     if (tieneAgendada) {
                         agendadasCount++;
-                        lead.estadoFinal = "Agendada";
+                        lead.estadoFinal = "Programada";
                     } else if (tieneRespondida) {
                         respondidasCount++;
                         lead.estadoFinal = "Contactada";
@@ -655,7 +795,7 @@
                 totalContactadosGlobal += respondidasCount;
                 totalNoRespondidasGlobal += noRespondidasCount;
 
-                let tasaContactoNum = nLeadsUnicos > 0 ? ((respondidasCount + agendadasCount) / nLeadsUnicos * 100) : 0;
+                let tasaContactoNum = nLeadsUnicos > 0 ? (respondidasCount / nLeadsUnicos * 100) : 0;
                 let tasaAgendamientoNum = nLeadsUnicos > 0 ? (agendadasCount / nLeadsUnicos * 100) : 0;
 
                 globalAgentsData.push({
@@ -681,16 +821,119 @@
                 totalContactados: totalContactadosGlobal,
                 totalAgendados: totalAgendadosGlobal,
                 totalNoRespondidas: totalNoRespondidasGlobal,
-                tasaContactoGeneral: totalLeadsReales > 0 ? ((totalContactadosGlobal + totalAgendadosGlobal) / totalLeadsReales * 100).toFixed(1) + '%' : '0.0%',
+                tasaContactoGeneral: totalLeadsReales > 0 ? (totalContactadosGlobal / totalLeadsReales * 100).toFixed(1) + '%' : '0.0%',
                 tasaAgendamientoGeneral: totalLeadsReales > 0 ? (totalAgendadosGlobal / totalLeadsReales * 100).toFixed(1) + '%' : '0.0%'
             };
 
-            renderKPIs();
-            renderAgentCards(globalAgentsData);
+            if (actualizarVista) {
+                actualizarSelectorAgentesComparacion();
+                renderKPIs();
+                renderAgentCards(globalAgentsData);
+                dashboardSection.classList.remove('hidden');
+                uploadSection.classList.add('hidden');
+            }
 
-            dashboardSection.classList.remove('hidden');
-            uploadSection.classList.add('hidden');
+        }
 
+        function obtenerMetricasAgenteEnDia(nombreAgente, dia) {
+            const filas = globalAllRawData.filter(row => dia === 'undated' ? !obtenerFechaCreacion(row) : obtenerFechaCreacion(row) === dia);
+            if (!filas.length) return null;
+            const respaldo = { raw: globalRawData, agents: globalAgentsData, stats: globalStats };
+            try {
+                processExcelData(filas, false);
+                const agente = globalAgentsData.find(item => item.name === nombreAgente);
+                return agente ? {
+                    totalCalls: agente.totalCalls,
+                    leadsUnicos: agente.leadsUnicos,
+                    respondidas: agente.respondidas,
+                    agendadas: agente.agendadas,
+                    noRespondidas: agente.noRespondidas,
+                    tasaContactoNum: agente.tasaContactoNum,
+                    tasaAgendamientoNum: agente.tasaAgendamientoNum
+                } : { totalCalls: 0, leadsUnicos: 0, respondidas: 0, agendadas: 0, noRespondidas: 0, tasaContactoNum: 0, tasaAgendamientoNum: 0 };
+            } finally {
+                globalRawData = respaldo.raw;
+                globalAgentsData = respaldo.agents;
+                globalStats = respaldo.stats;
+            }
+        }
+
+        function etiquetaDiaComparacion(dia) {
+            return dia === 'undated' ? 'Sin fecha de creación' : formatearDiaSemana(dia);
+        }
+
+        function formatearDiaSemana(dia) {
+            const [year, month, day] = dia.split('-').map(Number);
+            return new Date(year, month - 1, day).toLocaleDateString('es-GT', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function renderComparacionAgente() {
+            const contenedor = document.getElementById('comparisonResults');
+            const agente = document.getElementById('comparisonAgent').value;
+            const diaA = document.getElementById('comparisonDateA').value;
+            const diaB = document.getElementById('comparisonDateB').value;
+            if (!agente || !diaA || !diaB) {
+                document.getElementById('comparisonCharts').classList.add('hidden');
+                contenedor.innerHTML = '<p class="text-xs text-slate-500 p-4">Se necesitan al menos dos fechas disponibles y un agente para comparar.</p>';
+                return;
+            }
+            const metricasA = obtenerMetricasAgenteEnDia(agente, diaA);
+            const metricasB = obtenerMetricasAgenteEnDia(agente, diaB);
+            if (!metricasA || !metricasB) {
+                document.getElementById('comparisonCharts').classList.add('hidden');
+                contenedor.innerHTML = '<p class="text-xs text-slate-500 p-4">No hay registros en una o ambas fechas seleccionadas.</p>';
+                return;
+            }
+            if (diaA === diaB) {
+                contenedor.innerHTML = '<p class="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3">Elegiste la misma fecha dos veces. Selecciona días distintos para ver el cambio entre períodos.</p>';
+            } else contenedor.innerHTML = '';
+            const filas = [
+                ['Llamadas', 'totalCalls', false], ['Leads reales', 'leadsUnicos', false],
+                ['Contactados', 'respondidas', false], ['Programadas', 'agendadas', false],
+                ['No respondidas', 'noRespondidas', false], ['Tasa de contacto', 'tasaContactoNum', true],
+                ['Tasa de programación', 'tasaAgendamientoNum', true]
+            ];
+            const filasHTML = filas.map(([label, key, porcentaje]) => {
+                const valorA = metricasA[key], valorB = metricasB[key], diferencia = valorB - valorA;
+                const formatear = valor => porcentaje ? `${valor.toFixed(1)}%` : valor.toLocaleString('es-GT');
+                const delta = porcentaje ? `${diferencia > 0 ? '+' : ''}${diferencia.toFixed(1)} puntos` : `${diferencia > 0 ? '+' : ''}${diferencia.toLocaleString('es-GT')}`;
+                const mejora = key === 'noRespondidas' ? -diferencia : diferencia;
+                const claseDelta = mejora > 0 ? 'text-emerald-600' : mejora < 0 ? 'text-rose-600' : 'text-slate-500';
+                return `<tr class="border-b border-slate-200 dark:border-slate-800"><th class="py-3 px-4 text-left font-bold">${label}</th><td class="py-3 px-4 text-center">${formatear(valorA)}</td><td class="py-3 px-4 text-center">${formatear(valorB)}</td><td class="py-3 px-4 text-center font-bold ${claseDelta}">${delta}</td></tr>`;
+            }).join('');
+            contenedor.insertAdjacentHTML('beforeend', `<table class="w-full min-w-[620px] text-xs"><thead><tr class="bg-slate-100 dark:bg-slate-950 text-slate-500 uppercase text-[10px]"><th class="py-3 px-4 text-left">Métrica</th><th class="py-3 px-4 text-center">${etiquetaDiaComparacion(diaA)}</th><th class="py-3 px-4 text-center">${etiquetaDiaComparacion(diaB)}</th><th class="py-3 px-4 text-center">Diferencia (B − A)</th></tr></thead><tbody>${filasHTML}</tbody></table>`);
+            document.getElementById('comparisonCharts').classList.remove('hidden');
+            renderGraficosComparacion(metricasA, metricasB, diaA, diaB);
+        }
+
+        function renderGraficosComparacion(a, b, diaA, diaB) {
+            [chartComparacionVolumen, chartComparacionResultados, chartComparacionTasas].forEach(chart => { if (chart) chart.destroy(); });
+            const etiquetasDias = [etiquetaDiaComparacion(diaA), etiquetaDiaComparacion(diaB)];
+            const baseOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, color: '#64748b' } } } };
+            chartComparacionVolumen = new Chart(document.getElementById('comparisonCallsChart'), {
+                type: 'bar',
+                data: { labels: ['Llamadas', 'Leads reales'], datasets: [
+                    { label: etiquetasDias[0], data: [a.totalCalls, a.leadsUnicos], backgroundColor: '#6366f1', borderRadius: 7 },
+                    { label: etiquetasDias[1], data: [b.totalCalls, b.leadsUnicos], backgroundColor: '#0ea5e9', borderRadius: 7 }
+                ] },
+                options: { ...baseOptions, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+            chartComparacionResultados = new Chart(document.getElementById('comparisonOutcomesChart'), {
+                type: 'bar',
+                data: { labels: ['Contactados', 'Programadas', 'No respondidas'], datasets: [
+                    { label: etiquetasDias[0], data: [a.respondidas, a.agendadas, a.noRespondidas], backgroundColor: '#8b5cf6', borderRadius: 6 },
+                    { label: etiquetasDias[1], data: [b.respondidas, b.agendadas, b.noRespondidas], backgroundColor: '#10b981', borderRadius: 6 }
+                ] },
+                options: { ...baseOptions, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+            chartComparacionTasas = new Chart(document.getElementById('comparisonRatesChart'), {
+                type: 'line',
+                data: { labels: etiquetasDias, datasets: [
+                    { label: 'Tasa de contacto', data: [a.tasaContactoNum, b.tasaContactoNum], borderColor: '#6366f1', backgroundColor: '#6366f1', tension: 0.3, fill: false },
+                    { label: 'Tasa de programación', data: [a.tasaAgendamientoNum, b.tasaAgendamientoNum], borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', tension: 0.3, fill: false }
+                ] },
+                options: { ...baseOptions, scales: { y: { beginAtZero: true, suggestedMax: 100, ticks: { callback: value => `${value}%` } } } }
+            });
         }
 
         function renderKPIs() {
@@ -713,7 +956,7 @@
                     <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">${globalStats.totalContactados}</div>
                 </div>
                 <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
-                    <span class="text-[10px] font-extrabold text-purple-500 uppercase">Agendados</span>
+                    <span class="text-[10px] font-extrabold text-purple-500 uppercase">Programadas</span>
                     <div class="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">${globalStats.totalAgendados}</div>
                 </div>
                 <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
@@ -725,7 +968,7 @@
                     <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${globalStats.tasaContactoGeneral}</div>
                 </div>
                 <div class="glass-card p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between col-span-1">
-                    <span class="text-[10px] font-extrabold text-purple-500 uppercase">Tasa Agendamiento</span>
+                    <span class="text-[10px] font-extrabold text-purple-500 uppercase">Tasa de programación</span>
                     <div class="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">${globalStats.tasaAgendamientoGeneral}</div>
                 </div>
             `;
@@ -760,7 +1003,7 @@
                                 <div class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">${agent.leadsUnicos}</div>
                             </div>
                             <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                                <span class="text-[10px] font-extrabold text-purple-500 uppercase">Agendadas</span>
+                                <span class="text-[10px] font-extrabold text-purple-500 uppercase">Programadas</span>
                                 <div class="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">${agent.agendadas}</div>
                             </div>
                             <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -823,6 +1066,50 @@
             tbody.innerHTML = html;
         }
 
+        function escaparHTML(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, caracter => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[caracter]);
+        }
+
+        function exportarRankingPDF() {
+            const sortBy = document.getElementById('rankingSortSelect').value;
+            const agentes = [...globalAgentsData].sort((a, b) => b[sortBy] - a[sortBy]);
+            const periodo = document.getElementById('selectedPeriod').textContent;
+            const popup = window.open('', '_blank');
+            if (!popup) {
+                alert('El navegador bloqueó la ventana del reporte. Permite ventanas emergentes para generar el PDF.');
+                return;
+            }
+            const kpis = [
+                ['Llamadas', globalStats.totalCalls],
+                ['Leads reales', globalStats.totalLeadsReales],
+                ['Agentes', globalStats.totalAgentes],
+                ['Contactados', globalStats.totalContactados],
+                ['Programadas', globalStats.totalAgendados],
+                ['No respondidas', globalStats.totalNoRespondidas],
+                ['Tasa de contacto', globalStats.tasaContactoGeneral],
+                ['Tasa de programación', globalStats.tasaAgendamientoGeneral]
+            ];
+            const tarjetas = kpis.map(([label, value]) => `<div class="kpi"><span>${escaparHTML(label)}</span><strong>${escaparHTML(value)}</strong></div>`).join('');
+            const filas = agentes.map((agente, indice) => `<tr>
+                <td class="position">${indice + 1}</td>
+                <td><strong>${escaparHTML(agente.name)}</strong><small>Ext. ${escaparHTML(agente.ext)}</small></td>
+                <td>${escaparHTML(agente.totalCalls)}</td>
+                <td>${escaparHTML(agente.leadsUnicos)}</td>
+                <td>${escaparHTML(agente.respondidas)}</td>
+                <td>${escaparHTML(agente.agendadas)}</td>
+                <td>${escaparHTML(agente.tasaContacto)}</td>
+            </tr>`).join('');
+            const encabezadoOrden = document.getElementById('rankingSortSelect').selectedOptions[0].textContent;
+            popup.document.open();
+            popup.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ranking de desempeño</title><style>
+                *{box-sizing:border-box}body{margin:0;padding:32px;background:#f1f5f9;color:#0f172a;font-family:Arial,sans-serif}.report{max-width:1100px;margin:auto;background:white;padding:34px;border-radius:20px;box-shadow:0 8px 30px #0f172a12}.top{border-bottom:3px solid #4f46e5;padding-bottom:18px;margin-bottom:22px}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#6366f1;font-weight:800}.top h1{font-size:27px;margin:8px 0 6px}.meta{font-size:12px;color:#64748b}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 28px}.kpi{padding:13px 15px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}.kpi span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:#64748b;font-weight:800}.kpi strong{display:block;margin-top:6px;font-size:20px;color:#4f46e5}.section-title{display:flex;justify-content:space-between;align-items:end;margin-bottom:10px}.section-title h2{font-size:17px;margin:0}.section-title span{font-size:11px;color:#64748b}table{width:100%;border-collapse:collapse;font-size:11px}thead{background:#eef2ff;color:#4338ca;text-transform:uppercase;font-size:9px;letter-spacing:.5px}th,td{padding:11px 10px;text-align:left;border-bottom:1px solid #e2e8f0}th:nth-child(n+3),td:nth-child(n+3){text-align:center}tbody tr:nth-child(even){background:#f8fafc}.position{font-weight:800;color:#4f46e5}td small{display:block;color:#64748b;margin-top:3px}.footer{margin-top:20px;text-align:right;color:#94a3b8;font-size:9px}@page{size:landscape;margin:12mm}@media print{body{padding:0;background:white}.report{max-width:none;padding:0;box-shadow:none;border-radius:0}.kpi{break-inside:avoid}tr{break-inside:avoid}}
+                </style></head><body><main class="report"><header class="top"><div class="eyebrow">Reporte de desempeño</div><h1>Ranking de agentes</h1><div class="meta">Período: ${escaparHTML(periodo)} · Orden: ${escaparHTML(encabezadoOrden)}</div></header><section class="kpis">${tarjetas}</section><section><div class="section-title"><h2>Posiciones por agente</h2><span>${agentes.length} agentes incluidos</span></div><table><thead><tr><th>Pos.</th><th>Asesor / Extensión</th><th>Llamadas</th><th>Leads reales</th><th>Contactados</th><th>Programadas</th><th>Tasa contacto</th></tr></thead><tbody>${filas}</tbody></table></section><div class="footer">Generado ${escaparHTML(new Date().toLocaleString('es-GT'))}</div></main></body></html>`);
+            popup.document.close();
+            setTimeout(() => popup.print(), 250);
+        }
+
         function renderInsights() {
             if (globalAgentsData.length === 0) return;
             let sortedByCalls = [...globalAgentsData].sort((a, b) => b.totalCalls - a.totalCalls);
@@ -848,8 +1135,8 @@
                 <div class="p-5 rounded-2xl bg-purple-500/5 border border-purple-500/20 flex items-start space-x-3">
                     <div class="w-8 h-8 rounded-xl bg-purple-500 text-white flex items-center justify-center shrink-0 font-bold"><i class="fa-solid fa-calendar-check"></i></div>
                     <div>
-                        <h4 class="text-xs font-black text-purple-600 dark:text-purple-400 uppercase">Líder en Agendamiento</h4>
-                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">El asesor <strong>${sortedByAgenda[0].name}</strong> encabeza los agendamientos con <strong>${sortedByAgenda[0].agendadas} leads programados</strong>.</p>
+                        <h4 class="text-xs font-black text-purple-600 dark:text-purple-400 uppercase">Líder en Programaciones</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">El asesor <strong>${sortedByAgenda[0].name}</strong> encabeza las programaciones con <strong>${sortedByAgenda[0].agendadas} leads programados</strong>.</p>
                     </div>
                 </div>
                 <div class="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex items-start space-x-3">
@@ -868,7 +1155,7 @@
           const hh=Math.max(320,agents.length*38+36), ih=document.getElementById('chartAgentsInner'); ih.style.height=hh+'px'; ih.style.minWidth=agents.length>18?'760px':'100%';
           if(chartLlamadasLeadsInstance) chartLlamadasLeadsInstance.destroy();
           chartLlamadasLeadsInstance=new Chart(document.getElementById('chartLlamadasLeads'),{type:'bar',data:{labels:agents.map(a=>a.name),datasets:[{label:'Llamadas',data:agents.map(a=>a.totalCalls),backgroundColor:'#6366f1',borderRadius:6},{label:'Leads únicos',data:agents.map(a=>a.leadsUnicos),backgroundColor:'#10b981',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:9,color:'#64748b',font:{size:11}}},tooltip:{backgroundColor:'#0f172a',padding:12,callbacks:{title:i=>agents[i[0].dataIndex].name}}},scales:{x:{beginAtZero:true,grid:{color:'rgba(148,163,184,.15)'},ticks:{precision:0,color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#64748b',callback:(_,i)=>short(agents[i].name)}}}}});
-          if(chartResultadosInstance) chartResultadosInstance.destroy(); chartResultadosInstance=new Chart(document.getElementById('chartResultados'),{type:'doughnut',data:{labels:['Agendados','Respondidos','No respondidos'],datasets:[{data:[globalStats.totalAgendados,globalStats.totalContactados,globalStats.totalNoRespondidas],backgroundColor:['#8b5cf6','#10b981','#f59e0b'],borderColor:'#fff',borderWidth:3,hoverOffset:7}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,color:'#64748b'}},tooltip:{backgroundColor:'#0f172a',padding:12,callbacks:{label:c=>{let t=c.dataset.data.reduce((x,y)=>x+y,0);return ' '+c.label+': '+c.raw.toLocaleString('es-GT')+' ('+(t?(c.raw/t*100).toFixed(1):'0.0')+'%)'}}}}}});
+          if(chartResultadosInstance) chartResultadosInstance.destroy(); chartResultadosInstance=new Chart(document.getElementById('chartResultados'),{type:'doughnut',data:{labels:['Programadas','Contactados','No respondidos'],datasets:[{data:[globalStats.totalAgendados,globalStats.totalContactados,globalStats.totalNoRespondidas],backgroundColor:['#8b5cf6','#10b981','#f59e0b'],borderColor:'#fff',borderWidth:3,hoverOffset:7}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,color:'#64748b'}},tooltip:{backgroundColor:'#0f172a',padding:12,callbacks:{label:c=>{let t=c.dataset.data.reduce((x,y)=>x+y,0);return ' '+c.label+': '+c.raw.toLocaleString('es-GT')+' ('+(t?(c.raw/t*100).toFixed(1):'0.0')+'%)'}}}}}});
           const eff=[...agents].sort((a,b)=>(parseFloat(b.tasaContactoNum)||0)-(parseFloat(a.tasaContactoNum)||0)), eh=document.getElementById('chartEfficiencyInner'); eh.style.height=Math.max(220,eff.length*34+48)+'px';eh.style.minWidth=eff.length>24?'760px':'100%';
           if(chartEficienciaInstance) chartEficienciaInstance.destroy(); chartEficienciaInstance=new Chart(document.getElementById('chartEficiencia'),{type:'bar',data:{labels:eff.map(a=>a.name),datasets:[{label:'Tasa de contacto',data:eff.map(a=>Number(a.tasaContactoNum)||0),backgroundColor:'#8b5cf6',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',callbacks:{title:i=>eff[i[0].dataIndex].name,label:i=>' Tasa de contacto: '+i.raw.toFixed(1)+'%'}}},scales:{x:{beginAtZero:true,max:100,grid:{color:'rgba(148,163,184,.15)'},ticks:{callback:v=>v+'%',color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#64748b',callback:(_,i)=>short(eff[i].name)}}}}});
         }
@@ -974,7 +1261,7 @@
 
         function copiarResumenTeams() {
             if (!currentSelectedAgent) return;
-            let texto = `📊 *REPORTE DE DESEMPEÑO - UPANA*\n👤 *Asesor:* ${currentSelectedAgent.name} (Ext. ${currentSelectedAgent.ext})\n───────────────────────────────\n📞 *Llamadas totales:* ${currentSelectedAgent.totalCalls}\n👥 *Leads reales (únicos):* ${currentSelectedAgent.leadsUnicos}\n📅 *Agendadas:* ${currentSelectedAgent.agendadas}\n✅ *Contactados:* ${currentSelectedAgent.respondidas}\n❌ *No respondidas:* ${currentSelectedAgent.noRespondidas}\n📈 *Tasa de contacto:* ${currentSelectedAgent.tasaContacto}\n✨ *Universidad Panamericana • Admisiones*`;
+            let texto = `📊 *REPORTE DE DESEMPEÑO - UPANA*\n👤 *Asesor:* ${currentSelectedAgent.name} (Ext. ${currentSelectedAgent.ext})\n───────────────────────────────\n📞 *Llamadas totales:* ${currentSelectedAgent.totalCalls}\n👥 *Leads reales (únicos):* ${currentSelectedAgent.leadsUnicos}\n📅 *Programadas:* ${currentSelectedAgent.agendadas}\n✅ *Contactados:* ${currentSelectedAgent.respondidas}\n❌ *No respondidas:* ${currentSelectedAgent.noRespondidas}\n📈 *Tasa de contacto:* ${currentSelectedAgent.tasaContacto}\n✨ *Universidad Panamericana • Admisiones*`;
             navigator.clipboard.writeText(texto).then(() => {
                 alert("¡Resumen copiado al portapapeles para MS Teams!");
             });
@@ -995,10 +1282,10 @@
                 ["Leads únicos", currentSelectedAgent.leadsUnicos],
                 ["Contactados", currentSelectedAgent.respondidas],
                 ["No respondidos", currentSelectedAgent.noRespondidas],
-                ["Agendados", currentSelectedAgent.agendadas],
+                ["Programadas", currentSelectedAgent.agendadas],
                 ["Sin clasificar", 0],
                 ["Tasa de contacto", currentSelectedAgent.tasaContacto],
-                ["Tasa de agendamiento", currentSelectedAgent.tasaAgendamiento],
+                ["Tasa de programación", currentSelectedAgent.tasaAgendamiento],
                 ["Promedio de llamadas por lead", (currentSelectedAgent.totalCalls / (currentSelectedAgent.leadsUnicos || 1)).toFixed(2)],
                 ["Fecha de generación", new Date().toLocaleString()]
             ];
@@ -1006,11 +1293,11 @@
             XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
 
             // 2. Leads
-            let leadsData = [["Lead", "Estado final", "Número de intentos", "Resultado del último intento", "Fecha del último intento", "Agendado", "Contactado", "No respondido", "Sin clasificar"]];
+            let leadsData = [["Lead", "Estado final", "Número de intentos", "Resultado del último intento", "Fecha del último intento", "Programado", "Contactado", "No respondido", "Sin clasificar"]];
             currentSelectedAgent.leadsList.forEach(lead => {
                 let ultimo = lead.intentos[lead.intentos.length - 1];
                 let estLower = ultimo.resultado.toLowerCase();
-                let agendado = (lead.estadoFinal === "Agendada") ? "Sí" : "No";
+                let agendado = (lead.estadoFinal === "Programada") ? "Sí" : "No";
                 let contactado = (lead.estadoFinal === "Contactada") ? "Sí" : "No";
                 let noRespondido = (lead.estadoFinal === "No respondida") ? "Sí" : "No";
                 let sinClasificar = (agendado === "No" && contactado === "No" && noRespondido === "No") ? "Sí" : "No";
@@ -1061,7 +1348,7 @@
             let wb = XLSX.utils.book_new();
 
             // Hoja 1 — Resumen general
-            let resumenRows = [["Agente", "Extensión", "Ranking", "Total llamadas", "Leads únicos", "Contactados", "No respondidos", "Agendados", "Desconocidos", "Tasa de contacto", "Tasa de agendamiento", "Promedio de llamadas por lead"]];
+            let resumenRows = [["Agente", "Extensión", "Ranking", "Total llamadas", "Leads únicos", "Contactados", "No respondidos", "Programadas", "Desconocidos", "Tasa de contacto", "Tasa de programación", "Promedio de llamadas por lead"]];
             let sortedByAgenda = [...globalAgentsData].sort((a,b) => b.totalCalls - a.totalCalls);
             sortedByAgenda.forEach((a, idx) => {
                 resumenRows.push([
@@ -1084,7 +1371,7 @@
             XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen general");
 
             // Hoja 2 — Leads
-            let leadsRows = [["Agente", "Extensión", "Lead", "Estado final", "Intentos", "Último resultado", "Última fecha", "Contactado", "No respondido", "Agendado", "Desconocido"]];
+            let leadsRows = [["Agente", "Extensión", "Lead", "Estado final", "Intentos", "Último resultado", "Última fecha", "Contactado", "No respondido", "Programado", "Desconocido"]];
             globalAgentsData.forEach(agent => {
                 agent.leadsList.forEach(lead => {
                     let ultimo = lead.intentos[lead.intentos.length - 1];
@@ -1098,7 +1385,7 @@
                         ultimo.fechaHora || "-",
                         lead.estadoFinal === "Contactada" ? "Sí" : "No",
                         lead.estadoFinal === "No respondida" ? "Sí" : "No",
-                        lead.estadoFinal === "Agendada" ? "Sí" : "No",
+                        lead.estadoFinal === "Programada" ? "Sí" : "No",
                         "No"
                     ]);
                 });
@@ -1137,6 +1424,203 @@
 
             XLSX.writeFile(wb, `Rendimiento_General_Agentes_${periodoParaArchivo()}.xlsx`);
         }
+    </script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+        import { collection, doc, getDocFromServer, getDocs, getDocsFromCache, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, serverTimestamp, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: 'AIzaSyAB4hS-FR5amDK8fem-Z1t_dXn3tbRDdC8',
+            authDomain: 'lmsupana.firebaseapp.com',
+            projectId: 'lmsupana',
+            storageBucket: 'lmsupana.firebasestorage.app',
+            messagingSenderId: '912778300770',
+            appId: '1:912778300770:web:84be7166f1620ac8e6303b',
+            measurementId: 'G-Z2PMT4KGJ0'
+        };
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        let database;
+        try {
+            database = initializeFirestore(firebaseApp, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+        } catch (error) {
+            database = getFirestore(firebaseApp);
+        }
+        const callsCollection = collection(database, 'crmCalls');
+        const ingestionMetadata = doc(database, 'system', 'ingestion');
+        const localRevisionKey = `firestore-cache-revision-${firebaseConfig.projectId}`;
+        let currentMetadata = null;
+
+        function canonicalizar(value) {
+            if (value instanceof Date) return value.toISOString();
+            if (Array.isArray(value)) return value.map(canonicalizar);
+            if (value && typeof value === 'object') {
+                return Object.keys(value).sort().reduce((result, key) => {
+                    if (key !== '__firebaseSourceKey' && value[key] !== undefined) result[key] = canonicalizar(value[key]);
+                    return result;
+                }, {});
+            }
+            return value;
+        }
+
+        function serializar(value) {
+            return JSON.stringify(canonicalizar(value));
+        }
+
+        function obtenerClaveOrigen(row) {
+            const recordId = row['ID de registro'] ?? row.id;
+            return recordId !== undefined && recordId !== null && String(recordId).trim() !== ''
+                ? `id:${String(recordId).trim()}`
+                : `row:${serializar(row)}`;
+        }
+
+        function hashDocumento(value) {
+            let hash = 14695981039346656037n;
+            const mask = (1n << 64n) - 1n;
+            for (let index = 0; index < value.length; index++) {
+                hash ^= BigInt(value.charCodeAt(index));
+                hash = (hash * 1099511628211n) & mask;
+            }
+            return `call_${hash.toString(16).padStart(16, '0')}`;
+        }
+
+        function limpiarFila(row) {
+            return JSON.parse(JSON.stringify(canonicalizar(row)));
+        }
+
+        function fechaMaxima(rows) {
+            return rows.map(row => window.parsearFechaFiltro(row['Hora de creación'])).filter(Boolean).sort().at(-1) || null;
+        }
+
+        async function leerDocumentos() {
+            const metadataSnapshot = await getDocFromServer(ingestionMetadata);
+            currentMetadata = metadataSnapshot?.exists() ? metadataSnapshot.data() : null;
+            const localRevision = localStorage.getItem(localRevisionKey);
+            if (currentMetadata?.revision && localRevision === currentMetadata.revision && Number.isInteger(currentMetadata.totalRecords)) {
+                try {
+                    const cached = await getDocsFromCache(callsCollection);
+                    if (cached.size === currentMetadata.totalRecords) return { documents: cached.docs, fromCache: true };
+                } catch (error) {}
+            }
+            const serverSnapshot = await getDocs(callsCollection);
+            if (currentMetadata?.revision) localStorage.setItem(localRevisionKey, currentMetadata.revision);
+            return { documents: serverSnapshot.docs, fromCache: false };
+        }
+
+        window.firebaseRecargarDatos = async function() {
+            if (!auth.currentUser) throw new Error('Inicia sesión antes de leer la base.');
+            window.mostrarEstadoDatabase('Conectando con la base de llamadas...', 'info');
+            try {
+                const { documents, fromCache } = await leerDocumentos();
+                const rows = documents.map(snapshot => {
+                    const stored = snapshot.data();
+                    return { ...stored.payload, __firebaseSourceKey: stored.sourceKey };
+                }).sort((a, b) => (window.parsearFechaFiltro(a['Hora de creación']) || '').localeCompare(window.parsearFechaFiltro(b['Hora de creación']) || ''));
+                const latestDate = currentMetadata?.latestCreationDate || fechaMaxima(rows);
+                window.onFirebaseDataLoaded(rows, { fromCache, latestDate });
+            } catch (error) {
+                window.mostrarEstadoDatabase(`No se pudieron cargar los datos de Firestore: ${error.message}`, 'error');
+            }
+        };
+
+        window.firebaseAlimentarDatos = async function(inputRows) {
+            if (!auth.currentUser) throw new Error('Inicia sesión con una cuenta autorizada antes de alimentar la base.');
+            const existingRows = window.obtenerRegistrosActuales();
+            const rowsByKey = new Map(existingRows.map(row => [row.__firebaseSourceKey || obtenerClaveOrigen(row), row]));
+            const incomingByKey = new Map();
+            let withoutDate = 0;
+            inputRows.forEach(inputRow => {
+                const payload = limpiarFila(inputRow);
+                if (!window.parsearFechaFiltro(payload['Hora de creación'])) {
+                    withoutDate++;
+                    return;
+                }
+                const sourceKey = obtenerClaveOrigen(payload);
+                incomingByKey.set(sourceKey, { payload, sourceKey });
+            });
+
+            const changes = [];
+            const savedRows = [];
+            let added = 0;
+            let updated = 0;
+            let unchanged = 0;
+            incomingByKey.forEach(({ payload, sourceKey }) => {
+                const existing = rowsByKey.get(sourceKey);
+                const existingPayload = existing ? limpiarFila(existing) : null;
+                if (existingPayload && serializar(existingPayload) === serializar(payload)) {
+                    unchanged++;
+                    return;
+                }
+                if (existing) updated++;
+                else added++;
+                const creationDate = window.parsearFechaFiltro(payload['Hora de creación']);
+                changes.push({ payload, sourceKey, creationDate });
+                savedRows.push({ ...payload, __firebaseSourceKey: sourceKey });
+                rowsByKey.set(sourceKey, { ...payload, __firebaseSourceKey: sourceKey });
+            });
+
+            for (let start = 0; start < changes.length; start += 400) {
+                const batch = writeBatch(database);
+                changes.slice(start, start + 400).forEach(change => {
+                    batch.set(doc(database, 'crmCalls', hashDocumento(change.sourceKey)), {
+                        sourceKey: change.sourceKey,
+                        creationDate: change.creationDate,
+                        payload: change.payload,
+                        updatedAt: serverTimestamp()
+                    });
+                });
+                await batch.commit();
+            }
+
+            if (changes.length || !currentMetadata) {
+                const revision = crypto.randomUUID();
+                const allRows = [...rowsByKey.values()];
+                const latestCreationDate = fechaMaxima(allRows);
+                await setDoc(ingestionMetadata, {
+                    totalRecords: allRows.length,
+                    latestCreationDate,
+                    revision,
+                    updatedAt: serverTimestamp()
+                });
+                currentMetadata = { totalRecords: allRows.length, latestCreationDate, revision };
+                localStorage.setItem(localRevisionKey, revision);
+            }
+
+            window.onFirebaseRowsSaved(savedRows, { added, updated, unchanged, withoutDate });
+        };
+
+        window.firebaseIniciarSesion = async function() {
+            try {
+                await signInWithPopup(auth, new GoogleAuthProvider());
+            } catch (error) {
+                window.mostrarEstadoDatabase(`No se pudo iniciar sesión: ${error.message}`, 'error');
+            }
+        };
+
+        window.firebaseCerrarSesion = async function() {
+            await signOut(auth);
+        };
+
+        document.getElementById('firebaseSignInBtn').disabled = false;
+        window.firebaseAutenticado = false;
+        onAuthStateChanged(auth, async user => {
+            const signInButton = document.getElementById('firebaseSignInBtn');
+            const signOutButton = document.getElementById('firebaseSignOutBtn');
+            const reloadButton = document.getElementById('reloadDataBtn');
+            const feedButton = document.getElementById('feedDataBtn');
+            window.firebaseAutenticado = Boolean(user);
+            signInButton.classList.toggle('hidden', Boolean(user));
+            signOutButton.classList.toggle('hidden', !user);
+            reloadButton.disabled = !user;
+            feedButton.disabled = !user;
+            if (user) {
+                await window.firebaseRecargarDatos();
+            } else {
+                window.onFirebaseSignedOut();
+                window.mostrarEstadoDatabase('Inicia sesión con una cuenta autorizada para consultar la base de llamadas.', 'info');
+            }
+        });
     </script>
 </body>
 </html>
