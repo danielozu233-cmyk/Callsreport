@@ -67,26 +67,19 @@
     <header class="glass-card sticky top-0 z-40 border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3.5">
-                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-xl shadow-indigo-500/30 border border-indigo-400/30">
-                    <i class="fa-solid fa-headset"></i>
-                </div>
                 <div>
                     <div class="flex items-center space-x-2">
                         <h1 class="text-base sm:text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-600 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
                             Analizar llamadas CRM
                         </h1>
-                        <span class="px-2 py-0.5 text-[10px] font-extrabold bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full border border-indigo-500/30 uppercase tracking-wider">CC</span>
                     </div>
-                    <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold flex items-center gap-1.5 mt-0.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>Auditoría de Leads</span>
-                    </p>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold mt-0.5">Universidad Panamericana</p>
                 </div>
             </div>
             
             <div class="flex items-center flex-wrap justify-center gap-2">
-                <button id="firebaseSignInBtn" onclick="window.firebaseIniciarSesion()" disabled class="disabled:opacity-40 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2">
-                    <i class="fa-brands fa-google"></i><span>Iniciar sesión</span>
+                <button id="firebaseSignInBtn" onclick="window.abrirLoginFirebase()" disabled class="disabled:opacity-40 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-envelope"></i><span>Iniciar sesión</span>
                 </button>
                 <button id="firebaseSignOutBtn" onclick="window.firebaseCerrarSesion()" class="hidden bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm border border-slate-300/80 dark:border-slate-700" title="Cerrar sesión">Salir</button>
                 <button id="reloadDataBtn" onclick="recargarDatos()" disabled class="disabled:opacity-40 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm border border-slate-300/80 dark:border-slate-700 flex items-center gap-2">
@@ -160,35 +153,22 @@
                 <!-- Inyectado por JS -->
             </div>
 
-            <!-- Data Quality & Actions Bar -->
-            <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 border border-slate-200 dark:border-slate-800">
-                <div class="flex items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-300" id="dataQualityBadge">
-                    <i class="fa-solid fa-shield-check text-emerald-500 text-base"></i>
-                    <span>Auditoría de Datos: <strong>100% válidos</strong> (0 registros sin propietario ni anomalías)</span>
-                </div>
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <button onclick="exportarExcelGeneral()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
-                        <i class="fa-solid fa-file-excel"></i> Descargar Excel
-                    </button>
-                </div>
-            </div>
-
             <!-- Tabs de Navegación -->
             <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto custom-scrollbar">
-                <button onclick="switchTab('cards')" id="tabCardsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-md transition whitespace-nowrap">
-                    <i class="fa-solid fa-id-card mr-1.5"></i> Fichas por Agente
-                </button>
-                <button onclick="switchTab('ranking')" id="tabRankingBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                <button onclick="switchTab('ranking')" id="tabRankingBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-md transition whitespace-nowrap">
                     <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i> Ranking de Desempeño
                 </button>
-                <button onclick="switchTab('comparison')" id="tabComparisonBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                    <i class="fa-solid fa-scale-balanced mr-1.5 text-sky-500"></i> Comparar agente
+                <button onclick="switchTab('cards')" id="tabCardsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                    <i class="fa-solid fa-id-card mr-1.5"></i> Fichas por Agente
                 </button>
                 <button onclick="switchTab('insights')" id="tabInsightsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
                     <i class="fa-solid fa-lightbulb mr-1.5 text-purple-500"></i> Insights del Período
                 </button>
                 <button onclick="switchTab('charts')" id="tabChartsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
                     <i class="fa-solid fa-chart-pie mr-1.5 text-emerald-500"></i> Gráficos Analíticos
+                </button>
+                <button onclick="switchTab('comparison')" id="tabComparisonBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition border border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                    <i class="fa-solid fa-scale-balanced mr-1.5 text-sky-500"></i> Comparar agente
                 </button>
 
             </div>
@@ -214,7 +194,7 @@
             </div>
 
             <!-- TAB 1: Tarjetas por Agente -->
-            <div id="tabCardsContent" class="space-y-4">
+            <div id="tabCardsContent" class="hidden space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
                     <h3 class="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
                         <i class="fa-solid fa-users text-indigo-500"></i> Listado de Asesores de Admisiones
@@ -232,7 +212,7 @@
             </div>
 
             <!-- TAB 2: Ranking -->
-            <div id="tabRankingContent" class="hidden space-y-4">
+            <div id="tabRankingContent" class="space-y-4">
                 <div class="glass-card rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800">
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
                         <div>
@@ -244,14 +224,16 @@
                         <div class="flex flex-wrap items-center gap-2">
                             <label class="text-xs font-bold text-slate-500">Ordenar por:</label>
                             <select id="rankingSortSelect" onchange="actualizarRanking()" class="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none">
-                                <option value="agendadas">Más Programadas</option>
+                                <option value="totalCalls" selected>Más Llamadas</option>
                                 <option value="respondidas">Más Contactados</option>
                                 <option value="leadsUnicos">Más Leads Reales</option>
-                                <option value="totalCalls">Más Llamadas</option>
                                 <option value="tasaContactoNum">Mayor Tasa de Contacto (%)</option>
                             </select>
                             <button onclick="exportarRankingPDF()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
                                 <i class="fa-solid fa-file-pdf"></i> Exportar ranking PDF
+                            </button>
+                            <button onclick="exportarExcelGeneral()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2">
+                                <i class="fa-solid fa-file-excel"></i> Descargar Excel
                             </button>
                         </div>
                     </div>
@@ -359,10 +341,28 @@
     <!-- Footer -->
     <footer class="glass-card border-t border-slate-200/80 dark:border-slate-800/80 py-5 text-center text-xs text-slate-500 mt-auto">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <span class="font-semibold">Universidad Panamericana • Departamento de Call Center</span>
-            <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">Desarrollado para Daniel Galvez • 2026</span>
+            <span class="font-semibold">Universidad Panamericana</span>
+            <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">Desarrollado para Call Center • 2026</span>
         </div>
     </footer>
+
+    <div id="firebaseLoginModal" class="hidden fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-sm p-4 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="firebaseLoginTitle">
+        <form onsubmit="event.preventDefault(); window.firebaseIniciarSesion();" class="w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between mb-5">
+                <h2 id="firebaseLoginTitle" class="text-lg font-black">Iniciar sesión</h2>
+                <button type="button" onclick="document.getElementById('firebaseLoginModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 dark:hover:text-white" aria-label="Cerrar">✕</button>
+            </div>
+            <label for="firebaseEmail" class="block text-xs font-bold mb-1.5">Correo electrónico</label>
+            <input id="firebaseEmail" type="email" autocomplete="username" required class="w-full mb-4 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label for="firebasePassword" class="block text-xs font-bold mb-1.5">Contraseña</label>
+            <input id="firebasePassword" type="password" autocomplete="current-password" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <p class="text-[11px] text-slate-500 mt-3">Usa la cuenta habilitada en Firebase Authentication.</p>
+            <div class="flex justify-end gap-2 mt-5">
+                <button type="button" onclick="document.getElementById('firebaseLoginModal').classList.add('hidden')" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800">Cancelar</button>
+                <button type="submit" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white">Entrar</button>
+            </div>
+        </form>
+    </div>
 
     <!-- Script Principal -->
     <script>
@@ -480,6 +480,10 @@
 
         function mostrarEstadoDatabase(mensaje, tipo = 'info') {
             const status = document.getElementById('databaseStatus');
+            if (tipo === 'info') {
+                status.classList.add('hidden');
+                return;
+            }
             const estilos = tipo === 'error'
                 ? 'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200'
                 : tipo === 'success'
@@ -514,9 +518,6 @@
             prepararFiltroFechas(rows);
             dateFilter.value = 'all';
             filtrarPorDia();
-            const prefijo = info.fromCache ? 'Datos cargados desde la caché local' : 'Datos sincronizados con Firestore';
-            const detalleFecha = info.latestDate ? ` · Última fecha: ${formatearDia(info.latestDate)}` : '';
-            mostrarEstadoDatabase(`${prefijo}: ${rows.length.toLocaleString('es-GT')} registros${detalleFecha}. La caché de este navegador conserva datos; evita equipos compartidos.`, 'success');
         };
 
         window.onFirebaseSignedOut = () => {
@@ -1427,7 +1428,7 @@
     </script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
-        import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
         import { collection, doc, getDocFromServer, getDocs, getDocsFromCache, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, serverTimestamp, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -1591,11 +1592,20 @@
         };
 
         window.firebaseIniciarSesion = async function() {
+            const email = document.getElementById('firebaseEmail').value.trim();
+            const password = document.getElementById('firebasePassword').value;
             try {
-                await signInWithPopup(auth, new GoogleAuthProvider());
+                await signInWithEmailAndPassword(auth, email, password);
+                document.getElementById('firebaseLoginModal').classList.add('hidden');
+                document.getElementById('firebasePassword').value = '';
             } catch (error) {
                 window.mostrarEstadoDatabase(`No se pudo iniciar sesión: ${error.message}`, 'error');
             }
+        };
+
+        window.abrirLoginFirebase = function() {
+            document.getElementById('firebaseLoginModal').classList.remove('hidden');
+            document.getElementById('firebaseEmail').focus();
         };
 
         window.firebaseCerrarSesion = async function() {
@@ -1618,7 +1628,6 @@
                 await window.firebaseRecargarDatos();
             } else {
                 window.onFirebaseSignedOut();
-                window.mostrarEstadoDatabase('Inicia sesión con una cuenta autorizada para consultar la base de llamadas.', 'info');
             }
         });
     </script>
