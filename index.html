@@ -777,18 +777,18 @@
                         return r.includes("no responde") || r.includes("buzon") || r.includes("ocupado") || r.includes("desconectado") || r.includes("invalido") || r.includes("inválido") || r.includes("equivocado");
                     });
 
+                    if (tieneRespondida) respondidasCount++;
                     if (tieneAgendada) {
                         agendadasCount++;
                         lead.estadoFinal = "Programada";
                     } else if (tieneRespondida) {
-                        respondidasCount++;
                         lead.estadoFinal = "Contactada";
                     } else if (todoNoResponde) {
                         noRespondidasCount++;
                         lead.estadoFinal = "No respondida";
                     } else {
-                        if (tieneRespondida) { respondidasCount++; lead.estadoFinal = "Contactada"; }
-                        else { noRespondidasCount++; lead.estadoFinal = "No respondida"; }
+                        noRespondidasCount++;
+                        lead.estadoFinal = "No respondida";
                     }
                 });
 
